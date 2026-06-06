@@ -1,4 +1,5 @@
 from __future__ import annotations
+from utils.logging_utils import log_execution, setup_global_logger
 
 from collections import defaultdict
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Sequence
@@ -21,6 +22,7 @@ PASS1_REQUIRED_KEYS = {
 PASS3_REQUIRED_KEYS = PASS1_REQUIRED_KEYS | {"proposed_new_labels"}
 
 
+@log_execution
 def _sanitize_weight_map(value: Any) -> Dict[str, float]:
     out: Dict[str, float] = {}
     if isinstance(value, dict):
@@ -48,6 +50,7 @@ def _sanitize_weight_map(value: Any) -> Dict[str, float]:
     return out
 
 
+@log_execution
 def _sanitize_common_failures(value: Any) -> Dict[str, Dict[str, Any]]:
     out: Dict[str, Dict[str, Any]] = {}
     if not isinstance(value, dict):
@@ -71,6 +74,7 @@ def _sanitize_common_failures(value: Any) -> Dict[str, Dict[str, Any]]:
     return out
 
 
+@log_execution
 def sanitize_metadata_shape(metadata: Any, *, include_proposed: bool = False) -> tuple[Dict[str, Any], List[str]]:
     issues: List[str] = []
     if not isinstance(metadata, dict):
@@ -134,6 +138,7 @@ def sanitize_metadata_shape(metadata: Any, *, include_proposed: bool = False) ->
     return cleaned, issues
 
 
+@log_execution
 def sanitize_allowed_labels(labels: Iterable[str]) -> List[str]:
     clean = []
     seen = set()
@@ -145,6 +150,7 @@ def sanitize_allowed_labels(labels: Iterable[str]) -> List[str]:
     return clean
 
 
+@log_execution
 def filter_to_allowed_weight_map(weight_map: Mapping[str, float], allowed: Sequence[str]) -> tuple[Dict[str, float], List[str]]:
     allowed_set = set(sanitize_allowed_labels(allowed))
     kept: Dict[str, float] = {}
@@ -160,6 +166,7 @@ def filter_to_allowed_weight_map(weight_map: Mapping[str, float], allowed: Seque
     return kept, sorted(set(proposed))
 
 
+@log_execution
 def validate_pass3_metadata(
     metadata: Dict[str, Any],
     *,
@@ -259,6 +266,7 @@ def validate_pass3_metadata(
     return issues
 
 
+@log_execution
 def status_from_issues(issues: Sequence[str]) -> str:
     if not issues:
         return "valid"

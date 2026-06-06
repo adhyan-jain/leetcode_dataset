@@ -1,4 +1,5 @@
 from __future__ import annotations
+from utils.logging_utils import log_execution, setup_global_logger
 
 import math
 import re
@@ -18,12 +19,14 @@ _CAMEL_RE_2 = re.compile(r"([a-z0-9])([A-Z])")
 _SENTENCE_RE = re.compile(r"[.!?]\s")
 
 
+@log_execution
 def normalize_whitespace(text: str | None) -> str:
     if text is None:
         return ""
     return re.sub(r"\s+", " ", str(text)).strip()
 
 
+@log_execution
 def to_ascii(text: str | None) -> str:
     if text is None:
         return ""
@@ -34,6 +37,7 @@ def to_ascii(text: str | None) -> str:
     )
 
 
+@log_execution
 def snake_case(text: str | None) -> str:
     if text is None:
         return ""
@@ -51,6 +55,7 @@ def snake_case(text: str | None) -> str:
     return text
 
 
+@log_execution
 def singularize_label(label: str) -> str:
     label = snake_case(label)
     if not label:
@@ -67,6 +72,7 @@ def singularize_label(label: str) -> str:
     return "_".join(parts)
 
 
+@log_execution
 def normalize_label(label: str | None) -> str:
     label = snake_case(label)
     label = singularize_label(label)
@@ -74,6 +80,7 @@ def normalize_label(label: str | None) -> str:
     return label
 
 
+@log_execution
 def looks_like_sentence(label: str | None) -> bool:
     if not label:
         return False
@@ -83,6 +90,7 @@ def looks_like_sentence(label: str | None) -> bool:
     return bool(_SENTENCE_RE.search(text))
 
 
+@log_execution
 def fuzzy_ratio(a: str, b: str) -> int:
     a_norm = normalize_label(a)
     b_norm = normalize_label(b)
@@ -93,6 +101,7 @@ def fuzzy_ratio(a: str, b: str) -> int:
     return int(SequenceMatcher(None, a_norm, b_norm).ratio() * 100)
 
 
+@log_execution
 def best_match(label: str, candidates: Sequence[str]) -> tuple[str | None, int]:
     best_label = None
     best_score = -1
@@ -104,6 +113,7 @@ def best_match(label: str, candidates: Sequence[str]) -> tuple[str | None, int]:
     return best_label, best_score
 
 
+@log_execution
 def unique_preserve_order(items: Iterable[str]) -> List[str]:
     seen = set()
     result: List[str] = []
@@ -115,12 +125,14 @@ def unique_preserve_order(items: Iterable[str]) -> List[str]:
     return result
 
 
+@log_execution
 def is_probably_long_label(label: str | None, threshold: int = 40) -> bool:
     if not label:
         return False
     return len(normalize_whitespace(str(label))) >= threshold
 
 
+@log_execution
 def clamp01(value, default: float = 0.0) -> float:
     try:
         value = float(value)
@@ -131,6 +143,7 @@ def clamp01(value, default: float = 0.0) -> float:
     return max(0.0, min(1.0, value))
 
 
+@log_execution
 def clamp_int(value, default: int = 0, minimum: int | None = None, maximum: int | None = None) -> int:
     try:
         value = int(round(float(value)))
@@ -143,6 +156,7 @@ def clamp_int(value, default: int = 0, minimum: int | None = None, maximum: int 
     return value
 
 
+@log_execution
 def is_single_word(label: str | None) -> bool:
     if not label:
         return False

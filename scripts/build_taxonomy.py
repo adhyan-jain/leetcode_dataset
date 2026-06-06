@@ -1,4 +1,5 @@
 from __future__ import annotations
+from utils.logging_utils import log_execution, setup_global_logger
 
 import argparse
 import json
@@ -27,7 +28,8 @@ from utils.text_utils import (
 logger = logging.getLogger("build_taxonomy")
 
 
-def setup_logging() -> None:
+@log_execution
+def setup_global_logger() -> None:
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
@@ -133,6 +135,7 @@ BUILT_IN_ALIAS_MAP = {
 }
 
 
+@log_execution
 def load_manual_overrides(path: Path) -> Dict[str, Dict[str, str]]:
     if not path.exists():
         return {}
@@ -152,6 +155,7 @@ def load_manual_overrides(path: Path) -> Dict[str, Dict[str, str]]:
     return overrides
 
 
+@log_execution
 def setup_collector() -> Dict[str, Dict[str, Any]]:
     categories = ("domains", "algorithms", "patterns", "micro_skills", "failure_types", "pattern_clusters")
     return {
@@ -165,6 +169,7 @@ def setup_collector() -> Dict[str, Dict[str, Any]]:
     }
 
 
+@log_execution
 def add_label(bucket: Dict[str, Any], label: str, confidence: float, row_index: int) -> None:
     label = normalize_label(label)
     if not label:
@@ -175,6 +180,7 @@ def add_label(bucket: Dict[str, Any], label: str, confidence: float, row_index: 
     bucket["source_rows"][label].append(row_index)
 
 
+@log_execution
 def collect_from_row(row: Dict[str, Any], collector: Dict[str, Dict[str, Any]], row_index: int) -> None:
     metadata = row.get("pass1_metadata") if isinstance(row.get("pass1_metadata"), dict) else row.get("metadata")
     if not isinstance(metadata, dict):
@@ -214,6 +220,7 @@ def collect_from_row(row: Dict[str, Any], collector: Dict[str, Dict[str, Any]], 
         add_label(collector["pattern_clusters"], pattern_cluster, confidence, row_index)
 
 
+@log_execution
 def canonicalize_label(category: str, label: str, known_canonicals: List[str], threshold: int) -> str:
     label = normalize_label(label)
     if not label:
@@ -228,6 +235,7 @@ def canonicalize_label(category: str, label: str, known_canonicals: List[str], t
     return label
 
 
+@log_execution
 def build_category_mapping(
     category: str,
     collector: Dict[str, Any],
@@ -276,6 +284,7 @@ def build_category_mapping(
     return canonical_labels, mapping, suspicious
 
 
+@log_execution
 def build_report_section(
     category: str,
     collector: Dict[str, Any],
@@ -305,6 +314,7 @@ def build_report_section(
     return "\n".join(lines)
 
 
+@log_execution
 def manual_review_suggestions(
     all_mappings: Dict[str, Dict[str, str]],
     collectors: Dict[str, Dict[str, Any]],
@@ -319,8 +329,9 @@ def manual_review_suggestions(
     return suggestions[:100]
 
 
+@log_execution
 def main() -> int:
-    setup_logging()
+    setup_global_logger()
 
     parser = argparse.ArgumentParser(description="Build a cleaned taxonomy from pass1 output.")
     parser.add_argument("--input", required=True, help="Input JSONL from pass1_enriched")
