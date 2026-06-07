@@ -144,6 +144,7 @@ for item in [
     {"label": "wrong_modular_arithmetic", "description": "Modulo arithmetic or overflow handling is incorrect.", "aliases": [], "affected_skills": ["modular_arithmetic_guarding"], "affected_patterns": ["rolling_hash_search", "prime_sieve_factorization", "matrix_exponentiation_dp"]},
     {"label": "kadane_state_reset_error", "description": "Running subarray state is reset at the wrong time or not at all.", "aliases": [], "affected_skills": ["kadane_running_max_tracking"], "affected_patterns": ["kadane_max_subarray"]},
     {"label": "monotonic_queue_invariant_break", "description": "The monotonic order or stale expiration invariant is violated.", "aliases": [], "affected_skills": ["monotonic_queue_invariant"], "affected_patterns": ["monotonic_queue_window"]},
+    {"label": "incorrect_hashmap_usage", "description": "Hash-map lookup or update logic is applied incorrectly.", "aliases": ["incorrect_hash_map_usage"], "affected_skills": ["hash_map_usage", "hash_map_lookup"], "affected_patterns": ["two_sum", "string_matching", "cache_design"]},
 ]:
     add_item("failure_types", item)
 
@@ -170,6 +171,8 @@ for item in [
     {"label": "practice_order_statistics", "description": "Strengthen rank, selection, and sorted-container reasoning.", "target_type": "pattern", "target_label": "sorting_and_order_statistics"},
     {"label": "practice_geometry", "description": "Reinforce geometric orientation and sweep reasoning.", "target_type": "pattern", "target_label": "convex_hull_geometry"},
     {"label": "practice_monotonic_queue", "description": "Learn monotonic deque maintenance for sliding windows.", "target_type": "pattern", "target_label": "monotonic_queue_window"},
+    {"label": "learn_sliding_window", "description": "Learn to reason about contiguous windows, expansion, and shrink conditions.", "target_type": "pattern", "target_label": "sliding_window_variable"},
+    {"label": "practice", "description": "General practice or reinforcement for a known technique.", "target_type": "problem_role", "target_label": "reinforcement"},
     {"label": "linked_list_basics", "description": "Rebuild the basics of pointer manipulation and node rewiring.", "target_type": "domain", "target_label": "linked_list"},
     {"label": "bit_manipulation_basics", "description": "Review masks, shifts, and bitwise reasoning from first principles.", "target_type": "algorithm", "target_label": "bit_manipulation"},
     {"label": "practice_sorting", "description": "Strengthen comparison, counting, and bucket-based sorting.", "target_type": "algorithm", "target_label": "merge_sort"},
@@ -181,6 +184,7 @@ for item in [
     {"label": "diagnostic", "description": "Use the problem to diagnose a specific weakness."},
     {"label": "warmup", "description": "Use the problem as a light warmup or re-entry task."},
     {"label": "benchmark", "description": "Use the problem as a calibration or baseline test."},
+    {"label": "practice", "description": "Use the problem for general practice and reinforcement."},
 ]:
     add_item("problem_roles", item)
 

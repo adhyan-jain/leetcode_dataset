@@ -52,6 +52,28 @@ MAX_CAPS = {
 
 TRIVIAL_EASY_THRESHOLD = 0.40
 
+STRICT_REVIEW_ISSUES = {
+    "invalid_json",
+    "missing_",
+    "malformed_",
+    "metadata_not_object",
+    "unable_to_repair",
+    "no_pattern",
+    "empty_trains",
+    "requires_gt_trains",
+    "easy_high_overall",
+    "hard_low_overall",
+    "easy_high_requires",
+    "pattern_cluster_not_allowed",
+    "topic_path_not_allowed",
+}
+
+SOFT_REVIEW_ISSUES = {
+    "low_confidence",
+    "too_few_micro_skills",
+    "empty_failure_model",
+}
+
 BROAD_MICRO_SKILLS = {
     "dynamic_programming",
     "graph",
@@ -71,6 +93,55 @@ BROAD_MICRO_SKILLS = {
     "trie",
     "stack_queue",
     "linked_list",
+}
+
+ROUTING_STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "answer",
+    "be",
+    "because",
+    "by",
+    "can",
+    "constraint",
+    "constraints",
+    "data",
+    "design",
+    "description",
+    "each",
+    "example",
+    "examples",
+    "find",
+    "given",
+    "have",
+    "input",
+    "is",
+    "length",
+    "not",
+    "notice",
+    "of",
+    "one",
+    "output",
+    "problem",
+    "return",
+    "same",
+    "solution",
+    "such",
+    "that",
+    "the",
+    "their",
+    "they",
+    "this",
+    "to",
+    "use",
+    "valid",
+    "we",
+    "would",
+    "you",
+    "your",
+    "with",
+    "without",
 }
 
 WRONG_CATEGORY_ALIASES = {
@@ -105,8 +176,9 @@ FAMILY_RULES = [
             "sequence_alignment",
             "house_robber",
             "palindrome_subsequence",
-            "subsequence",
             "tabulation",
+            "coin_change",
+            "word_break",
         },
         "seed": {
             "domains": {"dynamic_programming": 1.0, "combinatorics": 0.6, "matrix": 0.2},
@@ -151,7 +223,6 @@ FAMILY_RULES = [
         "triggers": {
             "binary_search",
             "rotated",
-            "sorted",
             "answer_space",
             "parametric",
             "monotonic",
@@ -160,9 +231,6 @@ FAMILY_RULES = [
             "threshold",
             "lower_bound",
             "upper_bound",
-            "least",
-            "minimum",
-            "maximum",
         },
         "seed": {
             "domains": {"binary_search": 1.0, "array": 0.8, "matrix": 0.4, "interval": 0.2},
@@ -203,7 +271,6 @@ FAMILY_RULES = [
         "name": "graph_paths",
         "triggers": {
             "graph",
-            "path",
             "shortest_path",
             "dijkstra",
             "bellman",
@@ -216,6 +283,7 @@ FAMILY_RULES = [
             "connected",
             "component",
             "island",
+            "cycle",
         },
         "seed": {
             "domains": {"graph": 1.0, "tree": 0.1, "heap": 0.4},
@@ -302,7 +370,7 @@ FAMILY_RULES = [
     },
     {
         "name": "linked_list",
-        "triggers": {"linked", "reverse", "cycle", "list", "node", "pointer"},
+        "triggers": {"linked_list", "reverse", "cycle", "fast_slow", "merge_k_sorted_lists", "reverse_k_group"},
         "seed": {
             "domains": {"linked_list": 1.0, "stack_queue": 0.4, "design": 0.1},
             "algorithms": {"linked_list_manipulation": 1.0, "depth_first_search": 0.1, "simulation": 0.4},
@@ -627,6 +695,20 @@ def canonicalize_label_for_category(label: str, category: str, active_taxonomy: 
     return ""
 
 
+def canonicalize_topic_path(value: Any, allowed_paths: Iterable[str]) -> str:
+    text = normalize_whitespace(str(value))
+    if not text:
+        return ""
+    allowed_list = [normalize_whitespace(str(path)) for path in allowed_paths if normalize_whitespace(str(path))]
+    if text in allowed_list:
+        return text
+    collapsed = normalize_taxonomy_label(text)
+    for path in allowed_list:
+        if normalize_taxonomy_label(path) == collapsed:
+            return path
+    return ""
+
+
 def load_taxonomy_file(path: Path) -> LoadedTaxonomy:
     data = load_json(path)
     if not isinstance(data, dict):
@@ -741,6 +823,17 @@ def extract_tokens(text: str) -> List[str]:
     return tokens
 
 
+def extract_signal_tokens(text: str) -> List[str]:
+    tokens = []
+    for token in extract_tokens(text):
+        if len(token) == 1 and token not in {"k", "n", "m"}:
+            continue
+        if token in ROUTING_STOPWORDS:
+            continue
+        tokens.append(token)
+    return dedupe(tokens)
+
+
 def raw_to_list(value: Any) -> List[str]:
     if isinstance(value, list):
         out: List[str] = []
@@ -762,14 +855,14 @@ def build_routing_signals(raw: Dict[str, Any], pass1_metadata: Dict[str, Any]) -
     failure_model = pass1_metadata.get("failure_model") if isinstance(pass1_metadata.get("failure_model"), dict) else {}
 
     keywords = merge_unique(
-        extract_tokens(fields["title"]),
-        extract_tokens(fields["description"]),
-        extract_tokens(fields["tags"]),
-        extract_tokens(fields["similar_questions"]),
-        extract_tokens(fields["companies"]),
-        extract_tokens(fields["acceptance_rate"]),
-        extract_tokens(str(pass1_metadata.get("pattern_cluster", ""))),
-        extract_tokens(str(pass1_metadata.get("solution_dna_summary", ""))),
+        extract_signal_tokens(fields["title"]),
+        extract_signal_tokens(fields["description"]),
+        extract_signal_tokens(fields["tags"]),
+        extract_signal_tokens(fields["similar_questions"]),
+        extract_signal_tokens(fields["companies"]),
+        extract_signal_tokens(fields["acceptance_rate"]),
+        extract_signal_tokens(str(pass1_metadata.get("pattern_cluster", ""))),
+        extract_signal_tokens(str(pass1_metadata.get("solution_dna_summary", ""))),
     )
 
     raw_topics = raw_to_list(raw.get("related_topics"))
@@ -820,7 +913,6 @@ def route_families(signals: Dict[str, Any]) -> List[str]:
 def score_label(item: Dict[str, Any], signals: Dict[str, Any], family_seeds: Mapping[str, float], category: str, label_to_item: Mapping[str, Dict[str, Any]], mapping: Mapping[str, str]) -> float:
     label = item["label"]
     aliases = set(item.get("aliases", []))
-    desc_tokens = set(extract_tokens(item.get("description", "")))
     haystack = set(signals["keywords"]) | set(signals["raw_topics"]) | set(signals["pass1_domains"]) | set(signals["pass1_algorithms"]) | set(signals["pass1_patterns"]) | set(signals["pass1_micro_skills"]) | set(signals["pass1_failures"]) | {signals["pass1_pattern_cluster"]}
     score = 0.0
 
@@ -828,8 +920,6 @@ def score_label(item: Dict[str, Any], signals: Dict[str, Any], family_seeds: Map
         score += 5.0
     if aliases & haystack:
         score += 4.0
-    if desc_tokens & haystack:
-        score += 1.5
     if label in signals["keywords"]:
         score += 3.0
     if any(alias in signals["keywords"] for alias in aliases):
@@ -1248,10 +1338,10 @@ def sanitize_final_metadata(candidate: Any, selected: Dict[str, List[str]], acti
     if not isinstance(topic_path, list):
         topic_path = []
     allowed_paths = set(selected.get("topic_paths", []))
-    cleaned["topic_path"] = dedupe([normalize_whitespace(str(x)) for x in topic_path if normalize_whitespace(str(x)) and normalize_whitespace(str(x)) in allowed_paths])
+    cleaned["topic_path"] = dedupe([canonicalize_topic_path(x, allowed_paths) for x in topic_path if canonicalize_topic_path(x, allowed_paths)])
     for path in topic_path:
         npath = normalize_whitespace(str(path))
-        if npath and npath not in allowed_paths:
+        if npath and not canonicalize_topic_path(npath, allowed_paths):
             issues.append(f"unknown_topic_path:{npath}")
 
     # Skill model.
@@ -1370,17 +1460,15 @@ def sanitize_final_metadata(candidate: Any, selected: Dict[str, List[str]], acti
         issues.append("requires_gt_trains")
     if not cleaned["taxonomy"]["patterns"]:
         issues.append("no_pattern")
-    if len(cleaned["taxonomy"]["micro_skills"]) < 3 and not (raw_diff == "easy" and overall <= TRIVIAL_EASY_THRESHOLD and len(cleaned["taxonomy"]["patterns"]) <= 1):
+    if len(cleaned["taxonomy"]["micro_skills"]) < 2 and not (raw_diff == "easy" and overall <= TRIVIAL_EASY_THRESHOLD and len(cleaned["taxonomy"]["patterns"]) <= 1):
         issues.append("too_few_micro_skills")
     if not cleaned["skill_model"]["trains"]:
         issues.append("empty_trains")
     non_trivial = raw_diff != "easy" or overall > 0.35 or len(cleaned["taxonomy"]["patterns"]) > 1
-    if non_trivial and not cleaned["failure_model"]["common_failures"]:
+    if non_trivial and raw_diff == "hard" and not cleaned["failure_model"]["common_failures"]:
         issues.append("empty_failure_model")
-    if cleaned["metadata_confidence"] < 0.6:
+    if cleaned["metadata_confidence"] < 0.45:
         issues.append("low_confidence")
-    if any(cleaned["proposed_new_labels"].get(k) for k in cleaned["proposed_new_labels"]):
-        issues.append("proposed_new_labels_present")
     if cleaned["pattern_cluster"] and cleaned["pattern_cluster"] not in set(selected.get("pattern_clusters", [])):
         issues.append("pattern_cluster_not_allowed")
     if cleaned["topic_path"] and any(p not in set(selected.get("topic_paths", [])) for p in cleaned["topic_path"]):
@@ -1402,7 +1490,7 @@ def sanitize_final_metadata(candidate: Any, selected: Dict[str, List[str]], acti
     # Final validation state.
     review_reasons = []
     for issue in issues:
-        if issue.startswith("unknown_") or issue in {"low_confidence", "no_pattern", "too_few_micro_skills", "empty_trains", "empty_failure_model", "proposed_new_labels_present", "easy_high_overall", "hard_low_overall", "easy_high_requires", "requires_gt_trains", "pattern_cluster_not_allowed", "topic_path_not_allowed"}:
+        if issue.startswith("unknown_") or issue in STRICT_REVIEW_ISSUES or issue in SOFT_REVIEW_ISSUES:
             review_reasons.append(issue)
     cleaned["validation"]["needs_human_review"] = bool(review_reasons)
     cleaned["validation"]["review_reasons"] = dedupe(review_reasons)

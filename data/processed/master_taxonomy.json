@@ -3677,6 +3677,22 @@
       "affected_patterns": [
         "monotonic_queue_window"
       ]
+    },
+    {
+      "label": "incorrect_hashmap_usage",
+      "description": "Hash-map lookup or update logic is applied incorrectly.",
+      "aliases": [
+        "incorrect_hash_map_usage"
+      ],
+      "affected_skills": [
+        "hash_map_usage",
+        "hash_map_lookup"
+      ],
+      "affected_patterns": [
+        "two_sum",
+        "string_matching",
+        "cache_design"
+      ]
     }
   ],
   "pattern_clusters": [
@@ -4830,6 +4846,18 @@
       "description": "Review masks, shifts, and bitwise reasoning from first principles.",
       "target_type": "algorithm",
       "target_label": "bit_manipulation"
+    },
+    {
+      "label": "learn_sliding_window",
+      "description": "Learn to reason about contiguous windows, expansion, and shrink conditions.",
+      "target_type": "pattern",
+      "target_label": "sliding_window_variable"
+    },
+    {
+      "label": "practice",
+      "description": "General practice or reinforcement for a known technique.",
+      "target_type": "problem_role",
+      "target_label": "reinforcement"
     }
   ],
   "problem_roles": [
@@ -4872,6 +4900,10 @@
     {
       "label": "benchmark",
       "description": "Use the problem as a calibration or baseline test."
+    },
+    {
+      "label": "practice",
+      "description": "Use the problem for general practice and reinforcement."
     }
   ],
   "problem_traits": [
