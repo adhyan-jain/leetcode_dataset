@@ -91,6 +91,7 @@ def generate(
         "stream": False,
         "options": {
             "temperature": temperature,
+            "num_ctx": 8192,
         },
     }
     if prefer_json:

@@ -1547,7 +1547,9 @@ Rules:
 """
 
 
-def repair_prompt(errors: Sequence[str], bad_output: str, subset: Dict[str, List[Dict[str, Any]]], topic_paths: List[str]) -> str:
+def repair_prompt(errors: Sequence[str], bad_output: str, subset: Dict[str, Any], topic_paths: List[str]) -> str:
+    safe_subset = {k: subset[k] for k in subset if k != "topic_paths" and isinstance(k, str)}
+    subset_json = json.dumps(safe_subset, ensure_ascii=False, indent=2)
     return f"""Your previous JSON failed validation.
 
 Validation errors:
@@ -1557,7 +1559,7 @@ Previous output:
 {bad_output}
 
 Allowed taxonomy subset:
-{json.dumps({k: [x["label"] for x in subset[k]] for k in subset}, ensure_ascii=False, indent=2)}
+{subset_json}
 
 Allowed topic paths:
 {format_allowed_paths(topic_paths)}
