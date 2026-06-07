@@ -1,0 +1,4935 @@
+{
+  "domains": [
+    {
+      "label": "data_structure",
+      "description": "General structural surface area that is not itself a solving strategy.",
+      "aliases": [
+        "ds",
+        "data_structures"
+      ],
+      "parent": null
+    },
+    {
+      "label": "array",
+      "description": "Contiguous sequence surface area, including indexed list-style problems.",
+      "aliases": [
+        "arrays",
+        "arr"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "string",
+      "description": "Text and character-sequence surface area.",
+      "aliases": [
+        "strings",
+        "text",
+        "text_processing",
+        "string_processing"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "linked_list",
+      "description": "Node-chained linear structure surface area.",
+      "aliases": [
+        "linkedlists",
+        "singly_linked_list",
+        "list"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "stack_queue",
+      "description": "LIFO/FIFO and deque-style surface area.",
+      "aliases": [
+        "stack",
+        "queue",
+        "deque",
+        "stacks_and_queue"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "hash_table",
+      "description": "Key-based lookup surface area, including hash maps and sets.",
+      "aliases": [
+        "hash_map",
+        "hashmap",
+        "hashing",
+        "hash_tables"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "tree",
+      "description": "Hierarchical node structure surface area.",
+      "aliases": [
+        "trees",
+        "tree_traversal"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "binary_tree",
+      "description": "Binary tree surface area, usually without ordering guarantees.",
+      "aliases": [
+        "binary_tree_traversal"
+      ],
+      "parent": "tree"
+    },
+    {
+      "label": "binary_search_tree",
+      "description": "Ordered binary tree surface area with search-order constraints.",
+      "aliases": [
+        "bst",
+        "bst_property"
+      ],
+      "parent": "tree"
+    },
+    {
+      "label": "graph",
+      "description": "Node-and-edge surface area for connectivity, traversal, and paths.",
+      "aliases": [
+        "graphs",
+        "graph_theory",
+        "graph_traversal"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "matrix",
+      "description": "2D grid or matrix surface area.",
+      "aliases": [
+        "grid",
+        "matrice",
+        "matrix_manipulation"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "interval",
+      "description": "Range, segment, or time-interval surface area.",
+      "aliases": [
+        "intervals",
+        "line_sweep"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "heap",
+      "description": "Priority-queue surface area.",
+      "aliases": [
+        "priority_queue"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "trie",
+      "description": "Prefix-tree surface area.",
+      "aliases": [
+        "prefix_tree"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "math",
+      "description": "Numeric and algebraic surface area.",
+      "aliases": [
+        "mathematic",
+        "integer_arithmetic"
+      ],
+      "parent": null
+    },
+    {
+      "label": "bit_manipulation",
+      "description": "Bitwise and binary-representation surface area.",
+      "aliases": [
+        "bitwise_operation",
+        "binary_representation"
+      ],
+      "parent": "math"
+    },
+    {
+      "label": "combinatorics",
+      "description": "Counting, combinations, permutations, and subset surface area.",
+      "aliases": [
+        "combinatorial",
+        "combination"
+      ],
+      "parent": "math"
+    },
+    {
+      "label": "number_theory",
+      "description": "Divisibility, modular arithmetic, primes, and related numeric theory.",
+      "aliases": [
+        "integer_operation"
+      ],
+      "parent": "math"
+    },
+    {
+      "label": "design",
+      "description": "Data-structure design and stateful system surface area.",
+      "aliases": [
+        "oop",
+        "data_structure_design",
+        "file_system"
+      ],
+      "parent": null
+    },
+    {
+      "label": "sql",
+      "description": "Relational query surface area.",
+      "aliases": [
+        "database",
+        "query_optimization"
+      ],
+      "parent": null
+    },
+    {
+      "label": "simulation",
+      "description": "Stepwise execution, state updates, and implementation-heavy surface area.",
+      "aliases": [
+        "iteration",
+        "in_place_algorithm"
+      ],
+      "parent": null
+    },
+    {
+      "label": "ordered_map",
+      "description": "Order-aware associative surface area used for rank and range queries.",
+      "aliases": [
+        "balanced_bst_map",
+        "tree_map"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "segment_tree",
+      "description": "Interval tree surface area for range queries and updates.",
+      "aliases": [
+        "range_tree",
+        "segment_tree_node"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "binary_indexed_tree",
+      "description": "Fenwick tree surface area for prefix queries and updates.",
+      "aliases": [
+        "fenwick_tree",
+        "bit_tree"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "disjoint_set",
+      "description": "Disjoint-set surface area for connected-component maintenance.",
+      "aliases": [
+        "union_find",
+        "dsu"
+      ],
+      "parent": "data_structure"
+    },
+    {
+      "label": "probability",
+      "description": "Randomized and probabilistic problem surface area.",
+      "aliases": [
+        "probabilistic"
+      ],
+      "parent": "math"
+    },
+    {
+      "label": "randomized",
+      "description": "Randomized algorithm surface area and sampling-based problems.",
+      "aliases": [
+        "randomized_algorithm"
+      ],
+      "parent": "math"
+    },
+    {
+      "label": "geometry",
+      "description": "Spatial and coordinate geometry surface area.",
+      "aliases": [
+        "computational_geometry"
+      ],
+      "parent": "math"
+    }
+  ],
+  "algorithms": [
+    {
+      "label": "brute_force",
+      "description": "Enumerate possibilities directly when constraints are small.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "sorting",
+      "description": "Order elements to simplify downstream reasoning.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "binary_search",
+      "description": "Search a monotone ordered space by halving.",
+      "aliases": [
+        "binary_search_algorithm"
+      ],
+      "parent": null
+    },
+    {
+      "label": "binary_search_on_answer",
+      "description": "Binary search over a feasible answer space.",
+      "aliases": [
+        "binary_search_answer",
+        "binary_search_on_answers",
+        "parametric_search"
+      ],
+      "parent": null
+    },
+    {
+      "label": "two_pointers",
+      "description": "Coordinate two moving indices or cursors.",
+      "aliases": [
+        "two_pointer",
+        "two_pointer_technique"
+      ],
+      "parent": null
+    },
+    {
+      "label": "sliding_window_variable",
+      "description": "Expand and shrink a window while maintaining a condition.",
+      "aliases": [
+        "sliding_window",
+        "dynamic_sliding_window",
+        "sliding_window_var"
+      ],
+      "parent": null
+    },
+    {
+      "label": "prefix_sum",
+      "description": "Precompute cumulative totals to answer range queries or subarray conditions.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "hash_map_lookup",
+      "description": "Use hash-based lookup for membership, pairing, or counting.",
+      "aliases": [
+        "hash_map",
+        "hash_table",
+        "hashing"
+      ],
+      "parent": null
+    },
+    {
+      "label": "depth_first_search",
+      "description": "Traverse depth-first across trees or graphs.",
+      "aliases": [
+        "dfs",
+        "depth_first_search_dfs"
+      ],
+      "parent": null
+    },
+    {
+      "label": "breadth_first_search",
+      "description": "Traverse level by level or by shortest hop count.",
+      "aliases": [
+        "bfs",
+        "breadth_first_traversal"
+      ],
+      "parent": null
+    },
+    {
+      "label": "topological_sort",
+      "description": "Order nodes in a DAG consistent with dependencies.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "union_find",
+      "description": "Maintain dynamic connectivity with disjoint sets.",
+      "aliases": [
+        "disjoint_set_union",
+        "uf"
+      ],
+      "parent": null
+    },
+    {
+      "label": "dynamic_programming_top_down",
+      "description": "Recursive DP with memoization.",
+      "aliases": [
+        "top_down_dp",
+        "recursive_dp"
+      ],
+      "parent": null
+    },
+    {
+      "label": "dynamic_programming_bottom_up",
+      "description": "Iterative DP built from smaller states upward.",
+      "aliases": [
+        "bottom_up_dp",
+        "iterative_dynamic_programming",
+        "tabulation"
+      ],
+      "parent": null
+    },
+    {
+      "label": "backtracking",
+      "description": "Explore candidates recursively with undo/restore steps.",
+      "aliases": [
+        "recursive_backtracking"
+      ],
+      "parent": null
+    },
+    {
+      "label": "greedy_choice",
+      "description": "Make locally optimal choices that remain globally valid.",
+      "aliases": [
+        "greedy",
+        "greedy_algorithm"
+      ],
+      "parent": null
+    },
+    {
+      "label": "monotonic_stack",
+      "description": "Use a stack that preserves a monotone invariant.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "heap_priority_queue",
+      "description": "Use a heap for repeated extreme-element access.",
+      "aliases": [
+        "priority_queue"
+      ],
+      "parent": null
+    },
+    {
+      "label": "interval_merge",
+      "description": "Sort and merge overlapping intervals.",
+      "aliases": [
+        "in_place_merge"
+      ],
+      "parent": null
+    },
+    {
+      "label": "trie_search",
+      "description": "Use prefix-tree traversal for prefix or dictionary queries.",
+      "aliases": [
+        "trie"
+      ],
+      "parent": null
+    },
+    {
+      "label": "shortest_path",
+      "description": "Compute minimum-cost or minimum-hop routes in graphs.",
+      "aliases": [
+        "dijkstra",
+        "dijkstra_shortest_path"
+      ],
+      "parent": null
+    },
+    {
+      "label": "tree_traversal",
+      "description": "Traverse tree nodes in preorder, inorder, postorder, or level order.",
+      "aliases": [
+        "inorder_traversal",
+        "preorder_traversal",
+        "postorder_traversal",
+        "zigzag_traversal"
+      ],
+      "parent": null
+    },
+    {
+      "label": "matrix_traversal",
+      "description": "Traverse or transform a 2D grid systematically.",
+      "aliases": [
+        "grid_traversal",
+        "spiral_traversal"
+      ],
+      "parent": null
+    },
+    {
+      "label": "simulation",
+      "description": "Directly simulate the stated process with explicit state updates.",
+      "aliases": [
+        "iteration"
+      ],
+      "parent": null
+    },
+    {
+      "label": "state_machine",
+      "description": "Model the solution as states and transitions.",
+      "aliases": [
+        "finite_state_machine"
+      ],
+      "parent": null
+    },
+    {
+      "label": "bit_manipulation",
+      "description": "Use bitwise operators and bit-level reasoning.",
+      "aliases": [
+        "bitwise_operation"
+      ],
+      "parent": null
+    },
+    {
+      "label": "ordered_map",
+      "description": "Use an order-aware associative structure for ranked or range queries.",
+      "aliases": [
+        "balanced_bst_map"
+      ],
+      "parent": null
+    },
+    {
+      "label": "divide_and_conquer",
+      "description": "Split the problem into smaller subproblems and combine results.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "quickselect",
+      "description": "Select the k-th element via partition-based narrowing.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "stack_queue",
+      "description": "Use stack and queue discipline as standard algorithmic tooling.",
+      "aliases": [
+        "stack",
+        "queue",
+        "deque"
+      ],
+      "parent": null
+    },
+    {
+      "label": "linked_list_manipulation",
+      "description": "Operate on linked list nodes and pointers safely.",
+      "aliases": [
+        "linked_list",
+        "list_manipulation"
+      ],
+      "parent": null
+    },
+    {
+      "label": "binary_tree_construction",
+      "description": "Construct binary trees from traversal or adjacency data.",
+      "aliases": [
+        "tree_construction"
+      ],
+      "parent": null
+    },
+    {
+      "label": "segment_tree_query_update",
+      "description": "Use a segment tree to answer and update interval queries.",
+      "aliases": [
+        "segment_tree",
+        "range_query_tree"
+      ],
+      "parent": null
+    },
+    {
+      "label": "binary_indexed_tree_query_update",
+      "description": "Use a Fenwick tree for prefix-query and point-update workflows.",
+      "aliases": [
+        "binary_indexed_tree",
+        "fenwick_tree"
+      ],
+      "parent": null
+    },
+    {
+      "label": "single_source_shortest_path",
+      "description": "Compute shortest paths from one source, including weighted relaxations.",
+      "aliases": [
+        "sssp"
+      ],
+      "parent": null
+    },
+    {
+      "label": "all_pairs_shortest_path",
+      "description": "Compute shortest paths between all node pairs.",
+      "aliases": [
+        "apsp"
+      ],
+      "parent": null
+    },
+    {
+      "label": "dijkstra_shortest_path",
+      "description": "Single-source shortest path with non-negative weights and a priority queue.",
+      "aliases": [
+        "dijkstra"
+      ],
+      "parent": null
+    },
+    {
+      "label": "bellman_ford_shortest_path",
+      "description": "Single-source shortest path with edge relaxation and negative-weight support.",
+      "aliases": [
+        "bellman_ford"
+      ],
+      "parent": null
+    },
+    {
+      "label": "floyd_warshall_all_pairs_shortest_path",
+      "description": "All-pairs shortest path by dynamic relaxation over intermediate nodes.",
+      "aliases": [
+        "floyd_warshall",
+        "warshall"
+      ],
+      "parent": null
+    },
+    {
+      "label": "minimum_spanning_tree",
+      "description": "Build a minimum-cost spanning structure over weighted components.",
+      "aliases": [
+        "mst"
+      ],
+      "parent": null
+    },
+    {
+      "label": "prim_mst",
+      "description": "Grow an MST by repeatedly taking the cheapest frontier edge.",
+      "aliases": [
+        "prim"
+      ],
+      "parent": "minimum_spanning_tree"
+    },
+    {
+      "label": "kruskal_mst",
+      "description": "Build an MST by sorting edges and merging components.",
+      "aliases": [
+        "kruskal"
+      ],
+      "parent": "minimum_spanning_tree"
+    },
+    {
+      "label": "reservoir_sampling",
+      "description": "Sample items uniformly from a stream or large collection.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "meet_in_the_middle",
+      "description": "Split the search space into two halves and combine partial results.",
+      "aliases": [
+        "mitm"
+      ],
+      "parent": null
+    },
+    {
+      "label": "digit_dp",
+      "description": "Digit-wise dynamic programming over bounded numeric states.",
+      "aliases": [
+        "digit_dynamic_programming"
+      ],
+      "parent": null
+    },
+    {
+      "label": "bitmask_dp",
+      "description": "Dynamic programming over bitmask-encoded subsets or states.",
+      "aliases": [
+        "subset_dp",
+        "mask_dp"
+      ],
+      "parent": null
+    },
+    {
+      "label": "k_way_merge",
+      "description": "Merge multiple sorted streams or lists efficiently.",
+      "aliases": [
+        "k_merge"
+      ],
+      "parent": null
+    },
+    {
+      "label": "coordinate_compression",
+      "description": "Compress sparse coordinates into dense ranks or indices.",
+      "aliases": [
+        "compression"
+      ],
+      "parent": null
+    },
+    {
+      "label": "binary_lifting",
+      "description": "Use jump pointers for ancestor, LCA, or repeated-step queries.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "kmp_string_matching",
+      "description": "Prefix-function based linear-time string matching.",
+      "aliases": [
+        "kmp",
+        "knuth_morris_pratt"
+      ],
+      "parent": null
+    },
+    {
+      "label": "z_algorithm_string_matching",
+      "description": "Z-function based linear-time string matching.",
+      "aliases": [
+        "z_algorithm",
+        "z_algo"
+      ],
+      "parent": null
+    },
+    {
+      "label": "manacher_palindrome_radius",
+      "description": "Linear-time palindrome radius expansion.",
+      "aliases": [
+        "manacher"
+      ],
+      "parent": null
+    },
+    {
+      "label": "rolling_hash_string_matching",
+      "description": "Hash-based substring matching with rolling hashes.",
+      "aliases": [
+        "rolling_hash",
+        "rabin_karp",
+        "string_hashing"
+      ],
+      "parent": null
+    },
+    {
+      "label": "suffix_array",
+      "description": "Suffix array construction for substring ordering and queries.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "suffix_automaton",
+      "description": "Automaton over substrings for advanced string queries.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "tarjan_scc",
+      "description": "Tarjan low-link algorithm for strongly connected components.",
+      "aliases": [
+        "tarjan",
+        "tarjan_strongly_connected_components"
+      ],
+      "parent": null
+    },
+    {
+      "label": "kosaraju_scc",
+      "description": "Kosaraju two-pass algorithm for strongly connected components.",
+      "aliases": [
+        "kosaraju",
+        "kosaraju_strongly_connected_components"
+      ],
+      "parent": null
+    },
+    {
+      "label": "articulation_points",
+      "description": "Low-link articulation point detection in graphs.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "bridges",
+      "description": "Low-link bridge detection in graphs.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "eulerian_path",
+      "description": "Eulerian path construction with degree balance and edge consumption.",
+      "aliases": [
+        "hierholzer",
+        "hierholzer_algorithm",
+        "eulerian"
+      ],
+      "parent": null
+    },
+    {
+      "label": "sieve_of_eratosthenes",
+      "description": "Prime sieve for generating primes and marking composites.",
+      "aliases": [
+        "sieve",
+        "eratosthenes"
+      ],
+      "parent": null
+    },
+    {
+      "label": "prime_factorization",
+      "description": "Prime factor decomposition for number theory tasks.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "matrix_exponentiation",
+      "description": "Matrix powers for recurrence acceleration and walk counting.",
+      "aliases": [
+        "matrix_power"
+      ],
+      "parent": null
+    },
+    {
+      "label": "merge_sort",
+      "description": "Divide-and-conquer stable merge sorting.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "counting_sort",
+      "description": "Counting-based sorting over bounded ranges.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "bucket_sort",
+      "description": "Distribution-based sorting using buckets.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "deque",
+      "description": "Double-ended queue as a core tool for window and order maintenance.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "monotonic_queue",
+      "description": "Deque-based monotonic queue for sliding-window extrema.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "lfu_cache",
+      "description": "Least-frequently-used cache design with frequency buckets.",
+      "aliases": [
+        "lfu_cache_design"
+      ],
+      "parent": null
+    },
+    {
+      "label": "min_stack",
+      "description": "Stack supporting constant-time minimum queries.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "max_stack",
+      "description": "Stack supporting constant-time maximum queries.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "median_of_data_stream",
+      "description": "Online median maintenance with balanced heaps.",
+      "aliases": [
+        "median_finder"
+      ],
+      "parent": null
+    },
+    {
+      "label": "ordered_set",
+      "description": "Ordered set or tree-backed set supporting order statistics.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "line_sweep",
+      "description": "Event-based line sweep for intervals and geometry.",
+      "aliases": [
+        "sweep_line"
+      ],
+      "parent": null
+    },
+    {
+      "label": "convex_hull",
+      "description": "Computational geometry convex hull construction.",
+      "aliases": [],
+      "parent": null
+    },
+    {
+      "label": "kadane_algorithm",
+      "description": "Running maximum subarray accumulation with reset logic.",
+      "aliases": [
+        "kadane"
+      ],
+      "parent": null
+    },
+    {
+      "label": "zero_one_bfs",
+      "description": "Shortest path optimization for 0-1 weighted graphs using a deque.",
+      "aliases": [
+        "zero_one_bfs_shortest_path"
+      ],
+      "parent": null
+    }
+  ],
+  "patterns": [
+    {
+      "label": "two_pointers",
+      "description": "Move two cursors together to enforce ordering or reduce search space.",
+      "aliases": [
+        "two_pointer"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "two_pointers"
+      ],
+      "common_micro_skills": [
+        "pointer_update",
+        "index_management",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "sliding_window_variable",
+      "description": "Grow and shrink a window to maintain a target condition.",
+      "aliases": [
+        "sliding_window",
+        "dynamic_sliding_window"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "sliding_window_variable",
+        "prefix_sum"
+      ],
+      "common_micro_skills": [
+        "window_shrink_expand",
+        "state_tracking",
+        "edge_case_handling"
+      ]
+    },
+    {
+      "label": "monotonic_stack",
+      "description": "Use a stack to maintain monotone order and answer nearest-greater or nearest-smaller queries.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "monotonic_stack"
+      ],
+      "common_micro_skills": [
+        "stack_usage",
+        "monotonic_invariant",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "fast_slow_pointer",
+      "description": "Use two speeds to detect cycles or midpoints.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "two_pointers",
+        "linked_list_manipulation"
+      ],
+      "common_micro_skills": [
+        "pointer_update",
+        "linked_list_pointer_update",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "two_sum",
+      "description": "Find one pair that satisfies a target relation.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "hash_map_lookup",
+        "two_pointers"
+      ],
+      "common_micro_skills": [
+        "hash_map_usage",
+        "index_management",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "three_sum",
+      "description": "Find triples under a target relation, usually with sorting plus two pointers.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "sorting",
+        "two_pointers"
+      ],
+      "common_micro_skills": [
+        "sorting_preprocessing",
+        "two_pointer_coordination",
+        "duplicate_handling"
+      ]
+    },
+    {
+      "label": "subarray_sum",
+      "description": "Reason about contiguous sums, often with prefix sums or hashing.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "prefix_sum",
+        "hash_map_lookup"
+      ],
+      "common_micro_skills": [
+        "prefix_sum_construction",
+        "hash_map_usage",
+        "edge_case_handling"
+      ]
+    },
+    {
+      "label": "longest_substring_without_repeating",
+      "description": "Maintain a window with unique characters.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "sliding_window_variable",
+        "hash_map_lookup"
+      ],
+      "common_micro_skills": [
+        "window_shrink_expand",
+        "string_indexing",
+        "duplicate_handling"
+      ]
+    },
+    {
+      "label": "minimum_window_substring",
+      "description": "Find the smallest window satisfying a frequency requirement.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "sliding_window_variable",
+        "hash_map_lookup"
+      ],
+      "common_micro_skills": [
+        "window_shrink_expand",
+        "character_frequency_count",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "valid_parentheses",
+      "description": "Match opening and closing delimiters correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "stack_queue",
+        "simulation"
+      ],
+      "common_micro_skills": [
+        "stack_usage",
+        "parentheses_matching",
+        "edge_case_handling"
+      ]
+    },
+    {
+      "label": "palindrome_check",
+      "description": "Compare symmetric positions or state on both ends.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "two_pointers",
+        "string_matching"
+      ],
+      "common_micro_skills": [
+        "two_pointer_coordination",
+        "string_indexing",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "linked_list_reversal",
+      "description": "Reverse links while preserving the remaining chain.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "linked_list_manipulation",
+        "simulation"
+      ],
+      "common_micro_skills": [
+        "linked_list_pointer_update",
+        "pointer_update",
+        "sentinel_dummy_node"
+      ]
+    },
+    {
+      "label": "tree_level_order",
+      "description": "Traverse tree levels breadth-first.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "breadth_first_search",
+        "tree_traversal"
+      ],
+      "common_micro_skills": [
+        "queue_usage",
+        "tree_node_access",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "tree_dfs",
+      "description": "Traverse trees recursively or stack-based in depth-first order.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "depth_first_search",
+        "tree_traversal"
+      ],
+      "common_micro_skills": [
+        "recursion_depth_control",
+        "tree_node_access",
+        "base_case_selection"
+      ]
+    },
+    {
+      "label": "bst_validation",
+      "description": "Check BST ordering constraints using bounds or inorder logic.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "tree_traversal",
+        "binary_search_tree"
+      ],
+      "common_micro_skills": [
+        "invariant_maintenance",
+        "boundary_handling",
+        "tree_node_access"
+      ]
+    },
+    {
+      "label": "lowest_common_ancestor",
+      "description": "Find the shared ancestor that connects two nodes.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "depth_first_search",
+        "tree_traversal"
+      ],
+      "common_micro_skills": [
+        "tree_node_access",
+        "state_tracking",
+        "recursion_unwinding"
+      ]
+    },
+    {
+      "label": "tree_construction",
+      "description": "Build a tree from traversal, parent, or adjacency data.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "tree_traversal",
+        "binary_tree_construction",
+        "divide_and_conquer"
+      ],
+      "common_micro_skills": [
+        "tree_node_access",
+        "index_management",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "graph_connected_components",
+      "description": "Identify connected groups in a graph.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "depth_first_search",
+        "breadth_first_search",
+        "union_find"
+      ],
+      "common_micro_skills": [
+        "visited_marking",
+        "graph_adjacency_traversal",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "shortest_path",
+      "description": "Find minimum-cost or minimum-hop routes in graphs.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "single_source_shortest_path",
+        "all_pairs_shortest_path",
+        "dijkstra_shortest_path",
+        "bellman_ford_shortest_path",
+        "floyd_warshall_all_pairs_shortest_path",
+        "breadth_first_search"
+      ],
+      "common_micro_skills": [
+        "graph_adjacency_traversal",
+        "state_tracking",
+        "edge_case_handling"
+      ]
+    },
+    {
+      "label": "topological_ordering",
+      "description": "Order nodes while respecting dependency constraints.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "topological_sort"
+      ],
+      "common_micro_skills": [
+        "topological_indegree_tracking",
+        "graph_adjacency_traversal",
+        "visited_marking"
+      ]
+    },
+    {
+      "label": "merge_intervals",
+      "description": "Sort intervals and combine overlaps.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "interval_merge",
+        "sorting"
+      ],
+      "common_micro_skills": [
+        "interval_comparison",
+        "ordering_constraints",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "meeting_rooms",
+      "description": "Track simultaneous intervals to compute peak overlap.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "interval_merge",
+        "heap_priority_queue"
+      ],
+      "common_micro_skills": [
+        "interval_comparison",
+        "heap_usage",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "dp_linear_sequence",
+      "description": "Use DP across a 1D sequence or prefix.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "dynamic_programming_bottom_up",
+        "dynamic_programming_top_down"
+      ],
+      "common_micro_skills": [
+        "dp_transition_design",
+        "tabulation_ordering",
+        "memoization_table_design"
+      ]
+    },
+    {
+      "label": "dp_grid",
+      "description": "Use DP over 2D grid states.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "dynamic_programming_bottom_up",
+        "dynamic_programming_top_down"
+      ],
+      "common_micro_skills": [
+        "dp_transition_design",
+        "matrix_coordinate_mapping",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "backtracking_combinations",
+      "description": "Generate combinations with recursive choice and restore.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "backtracking"
+      ],
+      "common_micro_skills": [
+        "pruning",
+        "state_reset",
+        "base_case_selection"
+      ]
+    },
+    {
+      "label": "trie_prefix_search",
+      "description": "Use prefix structure for search, autocomplete, or matching.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "trie_search"
+      ],
+      "common_micro_skills": [
+        "tree_node_access",
+        "string_indexing",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "string_matching",
+      "description": "Find one string or pattern inside another.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "kmp_string_matching",
+        "rolling_hash"
+      ],
+      "common_micro_skills": [
+        "substring_extraction",
+        "string_indexing",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "matrix_spiral_traversal",
+      "description": "Traverse a grid in layered spiral order.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "matrix_traversal",
+        "simulation"
+      ],
+      "common_micro_skills": [
+        "matrix_coordinate_mapping",
+        "boundary_handling",
+        "direction_iteration"
+      ]
+    },
+    {
+      "label": "heap_top_k",
+      "description": "Use a heap to keep track of the top or bottom k elements.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "heap_priority_queue",
+        "quickselect"
+      ],
+      "common_micro_skills": [
+        "heap_usage",
+        "state_tracking",
+        "duplicate_handling"
+      ]
+    },
+    {
+      "label": "design_lru_cache",
+      "description": "Maintain bounded recency and O(1) lookup behavior.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "ordered_map",
+        "hash_map_lookup"
+      ],
+      "common_micro_skills": [
+        "hash_map_usage",
+        "state_tracking",
+        "pointer_update"
+      ]
+    },
+    {
+      "label": "design_median_finder",
+      "description": "Maintain streaming median with balanced structures.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "heap_priority_queue"
+      ],
+      "common_micro_skills": [
+        "heap_usage",
+        "state_tracking",
+        "ordering_constraints"
+      ]
+    },
+    {
+      "label": "sql_group_by",
+      "description": "Aggregate rows into grouped summaries.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "ordered_map"
+      ],
+      "common_micro_skills": [
+        "sql_grouping_reasoning",
+        "hash_map_usage",
+        "edge_case_handling"
+      ]
+    },
+    {
+      "label": "sql_window_function",
+      "description": "Use analytic windows for rolling or ranked queries.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "ordered_map"
+      ],
+      "common_micro_skills": [
+        "sql_window_reasoning",
+        "ordering_constraints",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "graph_union_find_components",
+      "description": "Use union-find to collapse components or equivalent nodes.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "union_find"
+      ],
+      "common_micro_skills": [
+        "union_find_path_compression",
+        "visited_marking",
+        "graph_component_tracking"
+      ]
+    },
+    {
+      "label": "cyclic_sort",
+      "description": "Place values into their index-matched positions.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "sorting"
+      ],
+      "common_micro_skills": [
+        "index_management",
+        "duplicate_handling",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "buy_and_sell_stock",
+      "description": "Track best buy/sell state over time.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "greedy_choice",
+        "dynamic_programming_bottom_up"
+      ],
+      "common_micro_skills": [
+        "state_tracking",
+        "rolling_accumulator",
+        "edge_case_handling"
+      ]
+    },
+    {
+      "label": "jump_game",
+      "description": "Track reachable progress through a sequence.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "greedy_choice",
+        "dynamic_programming_bottom_up"
+      ],
+      "common_micro_skills": [
+        "state_tracking",
+        "ordering_constraints",
+        "edge_case_handling"
+      ]
+    },
+    {
+      "label": "trapping_rain_water",
+      "description": "Accumulate bounded volume across elevations.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "two_pointers",
+        "prefix_sum"
+      ],
+      "common_micro_skills": [
+        "two_pointer_coordination",
+        "state_tracking",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "word_break",
+      "description": "Segment a string into valid dictionary pieces.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "dynamic_programming_bottom_up",
+        "trie_search"
+      ],
+      "common_micro_skills": [
+        "substring_extraction",
+        "dp_transition_design",
+        "hash_map_usage"
+      ]
+    },
+    {
+      "label": "combination_sum",
+      "description": "Search combinations that meet a target with reuse or bounded picks.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "backtracking"
+      ],
+      "common_micro_skills": [
+        "pruning",
+        "state_reset",
+        "duplicate_handling"
+      ]
+    },
+    {
+      "label": "subset_sum",
+      "description": "Determine whether or how a subset can reach a target sum.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "backtracking",
+        "dynamic_programming_bottom_up"
+      ],
+      "common_micro_skills": [
+        "dp_transition_design",
+        "pruning",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "n_queen",
+      "description": "Place items under row, column, and diagonal constraints.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "backtracking"
+      ],
+      "common_micro_skills": [
+        "pruning",
+        "state_reset",
+        "edge_case_handling"
+      ]
+    },
+    {
+      "label": "sudoku_validation",
+      "description": "Validate or solve a constrained board with row, column, and box rules.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "backtracking",
+        "simulation"
+      ],
+      "common_micro_skills": [
+        "matrix_coordinate_mapping",
+        "pruning",
+        "duplicate_handling"
+      ]
+    },
+    {
+      "label": "longest_consecutive_sequence",
+      "description": "Find the longest run of consecutive values.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "hash_map_lookup"
+      ],
+      "common_micro_skills": [
+        "hash_map_usage",
+        "state_tracking",
+        "duplicate_handling"
+      ]
+    },
+    {
+      "label": "all_pairs_shortest_path",
+      "description": "Compute shortest path between every node pair.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "floyd_warshall_all_pairs_shortest_path",
+        "dijkstra_shortest_path"
+      ],
+      "common_micro_skills": [
+        "distance_initialization",
+        "matrix_coordinate_mapping",
+        "graph_weight_handling"
+      ]
+    },
+    {
+      "label": "negative_cycle_detection",
+      "description": "Detect whether a weighted graph contains a reachable negative cycle.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "bellman_ford_shortest_path"
+      ],
+      "common_micro_skills": [
+        "edge_relaxation",
+        "negative_cycle_awareness",
+        "graph_weight_handling"
+      ]
+    },
+    {
+      "label": "minimum_spanning_tree",
+      "description": "Connect all nodes with minimum total edge weight.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "prim_mst",
+        "kruskal_mst",
+        "union_find"
+      ],
+      "common_micro_skills": [
+        "graph_component_tracking",
+        "ordering_constraints",
+        "graph_weight_handling"
+      ]
+    },
+    {
+      "label": "segment_tree_range_query",
+      "description": "Answer range queries with a segment tree and support updates.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "segment_tree_query_update",
+        "coordinate_compression"
+      ],
+      "common_micro_skills": [
+        "lazy_propagation",
+        "range_update_logic",
+        "tree_node_access"
+      ]
+    },
+    {
+      "label": "fenwick_prefix_query",
+      "description": "Answer prefix or point-update queries with a Fenwick tree.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "binary_indexed_tree_query_update"
+      ],
+      "common_micro_skills": [
+        "prefix_sum_construction",
+        "index_management",
+        "tree_node_access"
+      ]
+    },
+    {
+      "label": "reservoir_sampling",
+      "description": "Uniformly sample from a stream with fixed memory.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "reservoir_sampling"
+      ],
+      "common_micro_skills": [
+        "randomized_pivoting",
+        "probabilistic_reasoning",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "meet_in_the_middle",
+      "description": "Split search into halves and combine partial solutions.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "meet_in_the_middle",
+        "divide_and_conquer"
+      ],
+      "common_micro_skills": [
+        "subset_enumeration",
+        "balanced_partitioning",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "digit_dp",
+      "description": "Digit-position DP over constrained numbers.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "digit_dp",
+        "dynamic_programming_top_down"
+      ],
+      "common_micro_skills": [
+        "state_encoding",
+        "base_case_selection",
+        "overflow_guarding"
+      ]
+    },
+    {
+      "label": "bitmask_dp",
+      "description": "DP over bitmask states and subset families.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "bitmask_dp",
+        "dynamic_programming_bottom_up"
+      ],
+      "common_micro_skills": [
+        "bitmask_operations",
+        "subset_enumeration",
+        "state_encoding"
+      ]
+    },
+    {
+      "label": "tree_dp",
+      "description": "Dynamic programming on trees using subtree state.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "depth_first_search",
+        "dynamic_programming_bottom_up"
+      ],
+      "common_micro_skills": [
+        "tree_node_access",
+        "dp_transition_design",
+        "subtree_aggregation"
+      ]
+    },
+    {
+      "label": "binary_search_rotated_array",
+      "description": "Binary search in rotated or otherwise transformed ordered arrays.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "binary_search"
+      ],
+      "common_micro_skills": [
+        "binary_search_bounds",
+        "ordering_constraints",
+        "index_management"
+      ]
+    },
+    {
+      "label": "merge_k_sorted_lists",
+      "description": "Merge multiple sorted inputs efficiently.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "k_way_merge",
+        "heap_priority_queue"
+      ],
+      "common_micro_skills": [
+        "heap_usage",
+        "linked_list_pointer_update",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "reverse_k_group",
+      "description": "Reverse linked list nodes in fixed-size groups.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "linked_list_manipulation",
+        "simulation"
+      ],
+      "common_micro_skills": [
+        "linked_list_pointer_update",
+        "boundary_handling",
+        "sentinel_dummy_node"
+      ]
+    },
+    {
+      "label": "anagram_detection",
+      "description": "Detect whether two strings are rearrangements of each other.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "hash_map_lookup",
+        "sorting"
+      ],
+      "common_micro_skills": [
+        "character_frequency_count",
+        "string_indexing",
+        "duplicate_handling"
+      ]
+    },
+    {
+      "label": "subarray_product",
+      "description": "Reason about contiguous products or multiplicative windows.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "sliding_window_variable",
+        "prefix_sum"
+      ],
+      "common_micro_skills": [
+        "window_shrink_expand",
+        "overflow_guarding",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "palindrome_manacher",
+      "description": "Palindrome detection with center expansion or linear radius propagation.",
+      "aliases": [
+        "manacher_palindrome"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "manacher_palindrome_radius"
+      ],
+      "common_micro_skills": [
+        "palindrome_radius_expansion",
+        "boundary_handling",
+        "index_management"
+      ]
+    },
+    {
+      "label": "rolling_hash_search",
+      "description": "Substring search and comparison using rolling hash fingerprints.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "rolling_hash_string_matching"
+      ],
+      "common_micro_skills": [
+        "rolling_hash_collision_control",
+        "modular_arithmetic_guarding"
+      ]
+    },
+    {
+      "label": "suffix_structure_processing",
+      "description": "Substring analytics using suffix arrays or suffix automata.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "suffix_array",
+        "suffix_automaton"
+      ],
+      "common_micro_skills": [
+        "suffix_structure_building",
+        "state_encoding",
+        "index_management"
+      ]
+    },
+    {
+      "label": "strongly_connected_components",
+      "description": "Decompose directed graphs into strongly connected components.",
+      "aliases": [
+        "scc"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "tarjan_scc",
+        "kosaraju_scc"
+      ],
+      "common_micro_skills": [
+        "graph_adjacency_traversal",
+        "visited_marking",
+        "scc_lowlink_reasoning"
+      ]
+    },
+    {
+      "label": "eulerian_path_construction",
+      "description": "Build an ordering that uses each edge exactly once when possible.",
+      "aliases": [
+        "hierholzer_path"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "eulerian_path"
+      ],
+      "common_micro_skills": [
+        "eulerian_edge_traversal_tracking",
+        "graph_adjacency_traversal"
+      ]
+    },
+    {
+      "label": "prime_sieve_factorization",
+      "description": "Prime generation and factor decomposition for number theory tasks.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "sieve_of_eratosthenes",
+        "prime_factorization"
+      ],
+      "common_micro_skills": [
+        "sieve_marking",
+        "prime_factor_extraction"
+      ]
+    },
+    {
+      "label": "matrix_exponentiation_dp",
+      "description": "Recurrence acceleration via matrix powers and transition matrices.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "matrix_exponentiation"
+      ],
+      "common_micro_skills": [
+        "matrix_power_decomposition",
+        "state_encoding"
+      ]
+    },
+    {
+      "label": "sorting_and_order_statistics",
+      "description": "Sorting, ranking, and selection families.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "merge_sort",
+        "counting_sort",
+        "bucket_sort",
+        "ordered_set"
+      ],
+      "common_micro_skills": [
+        "bucket_bound_assignment",
+        "order_statistic_querying"
+      ]
+    },
+    {
+      "label": "cache_design",
+      "description": "Data structure design for bounded caches with eviction policies.",
+      "aliases": [
+        "lru_lfu_cache"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "lru_cache",
+        "lfu_cache"
+      ],
+      "common_micro_skills": [
+        "cache_eviction_policy",
+        "pointer_update",
+        "hash_map_usage"
+      ]
+    },
+    {
+      "label": "data_stream_median",
+      "description": "Online maintenance of statistics from a stream.",
+      "aliases": [
+        "median_finder"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "median_of_data_stream"
+      ],
+      "common_micro_skills": [
+        "heap_usage",
+        "heap_rebalancing",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "deque_window_processing",
+      "description": "Use a deque to maintain a moving window or monotonic frontier.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "deque",
+        "monotonic_queue"
+      ],
+      "common_micro_skills": [
+        "deque_window_management",
+        "monotonic_queue_invariant"
+      ]
+    },
+    {
+      "label": "line_sweep_intervals",
+      "description": "Sort events and sweep across intervals or geometric events.",
+      "aliases": [
+        "sweep_line"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "line_sweep"
+      ],
+      "common_micro_skills": [
+        "line_sweep_event_sorting",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "convex_hull_geometry",
+      "description": "Geometric hull construction and orientation reasoning.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "convex_hull"
+      ],
+      "common_micro_skills": [
+        "cross_product_orientation",
+        "geometry_point_ordering"
+      ]
+    },
+    {
+      "label": "kadane_max_subarray",
+      "description": "Track the best subarray ending at each position to maximize total sum.",
+      "aliases": [
+        "maximum_subarray"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "kadane_algorithm"
+      ],
+      "common_micro_skills": [
+        "kadane_running_max_tracking",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "monotonic_queue_window",
+      "description": "Maintain monotonic extrema within a moving sliding window.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "monotonic_queue",
+        "deque"
+      ],
+      "common_micro_skills": [
+        "monotonic_queue_invariant",
+        "deque_window_management"
+      ]
+    },
+    {
+      "label": "prefix_suffix_combination",
+      "description": "Combine prefix and suffix aggregates to answer local or global constraints.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "prefix_sum"
+      ],
+      "common_micro_skills": [
+        "prefix_sum_construction",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "advanced_bit_tricks",
+      "description": "Apply bitwise identities, masks, and binary reasoning.",
+      "aliases": [],
+      "parent": null,
+      "related_algorithms": [
+        "bit_manipulation",
+        "bitmask_dp"
+      ],
+      "common_micro_skills": [
+        "bitmask_operations",
+        "state_encoding"
+      ]
+    }
+  ],
+  "micro_skills": [
+    {
+      "label": "boundary_handling",
+      "description": "Handle inclusive/exclusive limits, endpoints, and stopping conditions.",
+      "aliases": [
+        "off_by_one_guard"
+      ],
+      "parent": null,
+      "related_patterns": [
+        "merge_intervals",
+        "two_pointers",
+        "sliding_window_variable"
+      ]
+    },
+    {
+      "label": "index_management",
+      "description": "Track indices safely across loops, arrays, and pointers.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "two_sum",
+        "cyclic_sort",
+        "matrix_spiral_traversal"
+      ]
+    },
+    {
+      "label": "pointer_update",
+      "description": "Advance or reroute pointers without losing state.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "two_pointers",
+        "linked_list_reversal",
+        "fast_slow_pointer"
+      ]
+    },
+    {
+      "label": "state_tracking",
+      "description": "Carry the right variables forward through the algorithm.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "buy_and_sell_stock",
+        "jump_game",
+        "design_lru_cache"
+      ]
+    },
+    {
+      "label": "invariant_maintenance",
+      "description": "Preserve the core condition that makes the solution valid.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "monotonic_stack",
+        "bst_validation",
+        "topological_ordering"
+      ]
+    },
+    {
+      "label": "base_case_selection",
+      "description": "Choose correct recursion or DP starting conditions.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "tree_dfs",
+        "backtracking_combinations",
+        "dp_linear_sequence"
+      ]
+    },
+    {
+      "label": "memoization_table_design",
+      "description": "Design cache keys and stored subproblem state correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "dp_linear_sequence",
+        "word_break",
+        "subset_sum"
+      ]
+    },
+    {
+      "label": "tabulation_ordering",
+      "description": "Fill DP tables in an order that respects dependencies.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "dp_linear_sequence",
+        "dp_grid",
+        "dp_interval"
+      ]
+    },
+    {
+      "label": "hash_map_usage",
+      "description": "Use hash-based storage for lookup, counting, and deduplication.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "two_sum",
+        "subarray_sum",
+        "longest_consecutive_sequence"
+      ]
+    },
+    {
+      "label": "stack_usage",
+      "description": "Use stack discipline for nesting, order, or backtracking state.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "valid_parentheses",
+        "monotonic_stack",
+        "tree_dfs"
+      ]
+    },
+    {
+      "label": "queue_usage",
+      "description": "Use queue discipline for breadth-first or staged processing.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "tree_level_order",
+        "graph_connected_components",
+        "shortest_path"
+      ]
+    },
+    {
+      "label": "heap_usage",
+      "description": "Use heap invariants for repeated min/max extraction.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "heap_top_k",
+        "design_median_finder",
+        "meeting_rooms"
+      ]
+    },
+    {
+      "label": "tree_node_access",
+      "description": "Read and connect parent, child, and node-local state correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "tree_level_order",
+        "tree_construction",
+        "lowest_common_ancestor"
+      ]
+    },
+    {
+      "label": "linked_list_pointer_update",
+      "description": "Update next pointers safely while preserving the chain.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "linked_list_reversal",
+        "linked_list_cycle",
+        "fast_slow_pointer"
+      ]
+    },
+    {
+      "label": "graph_adjacency_traversal",
+      "description": "Traverse neighbor lists or adjacency structures correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "graph_connected_components",
+        "shortest_path",
+        "topological_ordering"
+      ]
+    },
+    {
+      "label": "visited_marking",
+      "description": "Track explored nodes or states to avoid repetition.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "graph_connected_components",
+        "graph_union_find_components",
+        "tree_dfs"
+      ]
+    },
+    {
+      "label": "pruning",
+      "description": "Stop exploring branches that cannot lead to a valid answer.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "backtracking_combinations",
+        "combination_sum",
+        "n_queen"
+      ]
+    },
+    {
+      "label": "duplicate_handling",
+      "description": "Skip, merge, or count duplicates correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "three_sum",
+        "cyclic_sort",
+        "longest_consecutive_sequence"
+      ]
+    },
+    {
+      "label": "prefix_sum_construction",
+      "description": "Build cumulative values and use them safely in range logic.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "subarray_sum",
+        "trapping_rain_water",
+        "dp_linear_sequence"
+      ]
+    },
+    {
+      "label": "two_pointer_coordination",
+      "description": "Coordinate two moving bounds while preserving the intended order.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "two_pointers",
+        "palindrome_check",
+        "trapping_rain_water"
+      ]
+    },
+    {
+      "label": "binary_search_bounds",
+      "description": "Maintain correct low/high bounds and midpoint behavior.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "binary_search",
+        "binary_search_on_answer",
+        "tree_dfs"
+      ]
+    },
+    {
+      "label": "partitioning_logic",
+      "description": "Split items around pivots or thresholds correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "cyclic_sort",
+        "quickselect",
+        "topological_ordering"
+      ]
+    },
+    {
+      "label": "string_indexing",
+      "description": "Index and slice strings safely and intentionally.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "longest_substring_without_repeating",
+        "minimum_window_substring",
+        "string_matching"
+      ]
+    },
+    {
+      "label": "substring_extraction",
+      "description": "Extract and compare substrings without losing offsets.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "word_break",
+        "string_matching",
+        "minimum_window_substring"
+      ]
+    },
+    {
+      "label": "character_frequency_count",
+      "description": "Count and compare character multiplicities correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "minimum_window_substring",
+        "anagram_detection",
+        "sudoku_validation"
+      ]
+    },
+    {
+      "label": "parentheses_matching",
+      "description": "Track nesting and delimiter pairs accurately.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "valid_parentheses",
+        "monotonic_stack",
+        "tree_dfs"
+      ]
+    },
+    {
+      "label": "matrix_coordinate_mapping",
+      "description": "Translate between row-column positions and traversal order.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "matrix_spiral_traversal",
+        "matrix_rotation",
+        "sudoku_validation"
+      ]
+    },
+    {
+      "label": "union_find_path_compression",
+      "description": "Use parent compression and set merging correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "graph_union_find_components",
+        "graph_connected_components"
+      ]
+    },
+    {
+      "label": "bitmask_operations",
+      "description": "Use bit masks and bitwise operators precisely.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "bit_manipulation",
+        "n_queen",
+        "sudoku_validation"
+      ]
+    },
+    {
+      "label": "sql_grouping_reasoning",
+      "description": "Reason about group-level aggregation and filters.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "sql_group_by",
+        "sql_window_function"
+      ]
+    },
+    {
+      "label": "edge_case_handling",
+      "description": "Account for empty, minimal, boundary, or degenerate inputs.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "two_sum",
+        "merge_intervals",
+        "jump_game"
+      ]
+    },
+    {
+      "label": "sentinel_dummy_node",
+      "description": "Use a dummy or sentinel node to simplify pointer logic.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "linked_list_reversal",
+        "merge_two_sorted_lists"
+      ]
+    },
+    {
+      "label": "monotonic_invariant",
+      "description": "Keep a monotone relationship intact across updates.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "monotonic_stack",
+        "heap_top_k",
+        "longest_consecutive_sequence"
+      ]
+    },
+    {
+      "label": "window_shrink_expand",
+      "description": "Grow and shrink a window while preserving its contract.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "sliding_window_variable",
+        "minimum_window_substring",
+        "longest_substring_without_repeating"
+      ]
+    },
+    {
+      "label": "graph_cycle_detection",
+      "description": "Detect cycles in traversal or dependency structures.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "linked_list_cycle",
+        "topological_ordering",
+        "graph_connected_components"
+      ]
+    },
+    {
+      "label": "dp_transition_design",
+      "description": "Define the recurrence and state transition cleanly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "dp_linear_sequence",
+        "dp_grid",
+        "word_break"
+      ]
+    },
+    {
+      "label": "recursion_depth_control",
+      "description": "Keep recursive depth and branching under control.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "tree_dfs",
+        "backtracking_combinations",
+        "n_queen"
+      ]
+    },
+    {
+      "label": "overflow_guarding",
+      "description": "Prevent numeric or state overflow from breaking correctness.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "prefix_sum_construction",
+        "heap_top_k",
+        "sql_group_by"
+      ]
+    },
+    {
+      "label": "null_handling",
+      "description": "Handle missing, empty, or absent pointers and values safely.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "linked_list_cycle",
+        "tree_construction",
+        "design_lru_cache"
+      ]
+    },
+    {
+      "label": "edge_relaxation",
+      "description": "Relax weighted edges correctly in shortest-path algorithms.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "shortest_path",
+        "all_pairs_shortest_path",
+        "negative_cycle_detection"
+      ]
+    },
+    {
+      "label": "distance_initialization",
+      "description": "Initialize distances and unreachable states correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "all_pairs_shortest_path",
+        "shortest_path"
+      ]
+    },
+    {
+      "label": "negative_cycle_awareness",
+      "description": "Recognize and handle negative-weight cycles safely.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "negative_cycle_detection",
+        "bellman_ford_shortest_path"
+      ]
+    },
+    {
+      "label": "lazy_propagation",
+      "description": "Push deferred segment-tree updates only when needed.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "segment_tree_range_query"
+      ]
+    },
+    {
+      "label": "range_update_logic",
+      "description": "Apply range updates and interval merges with correct semantics.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "segment_tree_range_query",
+        "fenwick_prefix_query"
+      ]
+    },
+    {
+      "label": "coordinate_compression",
+      "description": "Compress sparse values into dense ranks for efficient indexing.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "segment_tree_range_query",
+        "fenwick_prefix_query"
+      ]
+    },
+    {
+      "label": "randomized_pivoting",
+      "description": "Choose randomized pivots or samples correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "reservoir_sampling",
+        "meet_in_the_middle",
+        "quickselect"
+      ]
+    },
+    {
+      "label": "probabilistic_reasoning",
+      "description": "Reason about expected value, uniform sampling, and probability constraints.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "reservoir_sampling"
+      ]
+    },
+    {
+      "label": "reservoir_update",
+      "description": "Maintain uniform sampling state over a stream.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "reservoir_sampling"
+      ]
+    },
+    {
+      "label": "subset_enumeration",
+      "description": "Enumerate subsets or half-sums efficiently.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "meet_in_the_middle",
+        "bitmask_dp",
+        "subset_sum"
+      ]
+    },
+    {
+      "label": "bitset_usage",
+      "description": "Use bitsets or bitmask encodings accurately.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "bitmask_dp",
+        "bit_manipulation"
+      ]
+    },
+    {
+      "label": "graph_weight_handling",
+      "description": "Track weighted edges, costs, and sign conventions correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "shortest_path",
+        "minimum_spanning_tree",
+        "negative_cycle_detection"
+      ]
+    },
+    {
+      "label": "k_way_merge_management",
+      "description": "Coordinate multiple sorted streams while merging efficiently.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "merge_k_sorted_lists"
+      ]
+    },
+    {
+      "label": "tree_dp_subproblem_design",
+      "description": "Define subtree states and combine children correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "tree_dp"
+      ]
+    },
+    {
+      "label": "subtree_aggregation",
+      "description": "Aggregate information from children back to a parent node.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "tree_dp",
+        "tree_dfs"
+      ]
+    },
+    {
+      "label": "state_encoding",
+      "description": "Encode search or DP state compactly and unambiguously.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "digit_dp",
+        "bitmask_dp",
+        "meet_in_the_middle"
+      ]
+    },
+    {
+      "label": "balanced_partitioning",
+      "description": "Split work or subsets into balanced halves for combination.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "meet_in_the_middle"
+      ]
+    },
+    {
+      "label": "cycle_entry_detection",
+      "description": "Detect the entry or existence of a cycle in iterative structures.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "linked_list_cycle",
+        "graph_cycle_detection",
+        "fast_slow_pointer"
+      ]
+    },
+    {
+      "label": "failure_function_construction",
+      "description": "Build prefix-function style failure links for string matching.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "string_matching"
+      ]
+    },
+    {
+      "label": "palindrome_radius_expansion",
+      "description": "Expand palindrome radii correctly across mirrored centers.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "palindrome_manacher"
+      ]
+    },
+    {
+      "label": "rolling_hash_collision_control",
+      "description": "Choose hash bases and moduli that keep collision risk acceptable.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "rolling_hash_search",
+        "string_matching"
+      ]
+    },
+    {
+      "label": "suffix_structure_building",
+      "description": "Construct suffix arrays or automata without corrupting ordering invariants.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "suffix_structure_processing"
+      ]
+    },
+    {
+      "label": "scc_lowlink_reasoning",
+      "description": "Track discovery and low-link values for SCC-style graph decompositions.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "strongly_connected_components"
+      ]
+    },
+    {
+      "label": "eulerian_edge_traversal_tracking",
+      "description": "Consume edges exactly once while preserving Eulerian path validity.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "eulerian_path_construction"
+      ]
+    },
+    {
+      "label": "sieve_marking",
+      "description": "Mark composite numbers correctly while traversing prime candidates.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "prime_sieve_factorization"
+      ]
+    },
+    {
+      "label": "prime_factor_extraction",
+      "description": "Repeatedly factor out primes and manage multiplicities correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "prime_sieve_factorization"
+      ]
+    },
+    {
+      "label": "matrix_power_decomposition",
+      "description": "Break exponentiation into binary powers and combine transition matrices.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "matrix_exponentiation_dp"
+      ]
+    },
+    {
+      "label": "merge_sort_split_merge",
+      "description": "Split recursively and merge sorted halves without losing stability or order.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "sorting_and_order_statistics"
+      ]
+    },
+    {
+      "label": "bucket_bound_assignment",
+      "description": "Choose bucket ranges and placement rules correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "sorting_and_order_statistics"
+      ]
+    },
+    {
+      "label": "deque_window_management",
+      "description": "Maintain a deque that tracks window candidates and expirations.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "deque_window_processing",
+        "monotonic_queue_window"
+      ]
+    },
+    {
+      "label": "line_sweep_event_sorting",
+      "description": "Sort and process sweep events in the correct order.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "line_sweep_intervals"
+      ]
+    },
+    {
+      "label": "cross_product_orientation",
+      "description": "Use vector cross products to determine geometric orientation and turns.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "convex_hull_geometry"
+      ]
+    },
+    {
+      "label": "cache_eviction_policy",
+      "description": "Maintain the correct eviction rule for cache state updates.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "cache_design"
+      ]
+    },
+    {
+      "label": "heap_rebalancing",
+      "description": "Keep heaps balanced so the chosen statistic stays correct.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "data_stream_median"
+      ]
+    },
+    {
+      "label": "order_statistic_querying",
+      "description": "Track rank or order statistics under insertions and deletions.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "sorting_and_order_statistics"
+      ]
+    },
+    {
+      "label": "modular_arithmetic_guarding",
+      "description": "Prevent overflow and preserve congruence when working mod integers.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "rolling_hash_search",
+        "prime_sieve_factorization",
+        "matrix_exponentiation_dp"
+      ]
+    },
+    {
+      "label": "kadane_running_max_tracking",
+      "description": "Maintain the best running subarray sum and reset correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "kadane_max_subarray"
+      ]
+    },
+    {
+      "label": "monotonic_queue_invariant",
+      "description": "Preserve monotonic order while expiring stale window elements.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "monotonic_queue_window"
+      ]
+    },
+    {
+      "label": "geometry_point_ordering",
+      "description": "Order points consistently for hull or sweep computations.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "convex_hull_geometry"
+      ]
+    },
+    {
+      "label": "array_indexing",
+      "description": "Address array elements safely with correct index math.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "two_pointers",
+        "subarray_sum"
+      ]
+    },
+    {
+      "label": "hash_map_lookup",
+      "description": "Retrieve and update hash-map entries without losing key semantics.",
+      "aliases": [
+        "hashmap_lookup"
+      ],
+      "parent": null,
+      "related_patterns": [
+        "string_matching",
+        "cache_design",
+        "two_sum"
+      ]
+    },
+    {
+      "label": "conditional_statement",
+      "description": "Apply branching logic to encode base cases and control flow.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "kadane_max_subarray",
+        "dp_linear_sequence"
+      ]
+    },
+    {
+      "label": "two_pointer_technique",
+      "description": "Coordinate left and right pointers across ordered data.",
+      "aliases": [
+        "two_pointer"
+      ],
+      "parent": null,
+      "related_patterns": [
+        "two_pointers",
+        "sliding_window_variable"
+      ]
+    },
+    {
+      "label": "ordering_constraints",
+      "description": "Preserve ordering rules while choosing among candidate states.",
+      "aliases": [
+        "ordering_constraint"
+      ],
+      "parent": null,
+      "related_patterns": [
+        "binary_search_rotated_array",
+        "sorting_and_order_statistics"
+      ]
+    },
+    {
+      "label": "board_representation",
+      "description": "Encode chessboard-like or grid-like states cleanly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "backtracking_combinations"
+      ]
+    },
+    {
+      "label": "constraint_checking",
+      "description": "Validate whether a partial assignment respects all rules.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "backtracking_combinations",
+        "strongly_connected_components"
+      ]
+    },
+    {
+      "label": "node_comparison",
+      "description": "Compare node values or structure while traversing trees or lists.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "tree_dfs",
+        "linked_list_reversal"
+      ]
+    }
+  ],
+  "failure_types": [
+    {
+      "label": "off_by_one",
+      "description": "Mistakes on inclusive/exclusive edges or index boundaries.",
+      "aliases": [
+        "off_by_one_error",
+        "boundary_bug",
+        "wrong_boundary"
+      ],
+      "affected_skills": [
+        "boundary_handling",
+        "index_management"
+      ],
+      "affected_patterns": [
+        "two_pointers",
+        "merge_intervals",
+        "sliding_window_variable"
+      ]
+    },
+    {
+      "label": "missing_base_case",
+      "description": "Forget the stopping condition or recursive anchor.",
+      "aliases": [
+        "incorrect_base_case",
+        "forgetting_base_case"
+      ],
+      "affected_skills": [
+        "base_case_selection",
+        "recursion_depth_control"
+      ],
+      "affected_patterns": [
+        "tree_dfs",
+        "backtracking_combinations",
+        "dp_linear_sequence"
+      ]
+    },
+    {
+      "label": "incorrect_state_transition",
+      "description": "Update the carried state in a way that breaks the recurrence or simulation.",
+      "aliases": [
+        "wrong_transition",
+        "incorrect_transition"
+      ],
+      "affected_skills": [
+        "state_tracking",
+        "dp_transition_design"
+      ],
+      "affected_patterns": [
+        "dp_linear_sequence",
+        "buy_and_sell_stock",
+        "jump_game"
+      ]
+    },
+    {
+      "label": "missing_memoization",
+      "description": "Fail to cache repeated subproblems.",
+      "aliases": [
+        "incorrect_memoization"
+      ],
+      "affected_skills": [
+        "memoization_table_design",
+        "dp_transition_design"
+      ],
+      "affected_patterns": [
+        "dp_linear_sequence",
+        "word_break",
+        "subset_sum"
+      ]
+    },
+    {
+      "label": "pointer_mismanagement",
+      "description": "Lose, overwrite, or misadvance a pointer in linked structures.",
+      "aliases": [
+        "incorrect_pointer_update",
+        "incorrect_pointer_assignment"
+      ],
+      "affected_skills": [
+        "pointer_update",
+        "linked_list_pointer_update"
+      ],
+      "affected_patterns": [
+        "linked_list_reversal",
+        "linked_list_cycle",
+        "fast_slow_pointer"
+      ]
+    },
+    {
+      "label": "null_pointer_access",
+      "description": "Dereference or use an absent node/value without checking.",
+      "aliases": [
+        "missing_null_check"
+      ],
+      "affected_skills": [
+        "null_handling",
+        "edge_case_handling"
+      ],
+      "affected_patterns": [
+        "tree_construction",
+        "linked_list_reversal",
+        "design_lru_cache"
+      ]
+    },
+    {
+      "label": "incorrect_indexing",
+      "description": "Read or write the wrong index or slice.",
+      "aliases": [
+        "wrong_indexing"
+      ],
+      "affected_skills": [
+        "index_management",
+        "string_indexing"
+      ],
+      "affected_patterns": [
+        "cyclic_sort",
+        "matrix_spiral_traversal",
+        "longest_substring_without_repeating"
+      ]
+    },
+    {
+      "label": "duplicate_handling_error",
+      "description": "Fail to skip, merge, or count duplicates correctly.",
+      "aliases": [
+        "incorrect_deduplication"
+      ],
+      "affected_skills": [
+        "duplicate_handling",
+        "hash_map_usage"
+      ],
+      "affected_patterns": [
+        "three_sum",
+        "cyclic_sort",
+        "longest_consecutive_sequence"
+      ]
+    },
+    {
+      "label": "edge_case_omission",
+      "description": "Miss a degenerate or boundary input case.",
+      "aliases": [
+        "missing_edge_case",
+        "incorrect_edge_case_handling"
+      ],
+      "affected_skills": [
+        "edge_case_handling"
+      ],
+      "affected_patterns": [
+        "two_sum",
+        "jump_game",
+        "merge_intervals"
+      ]
+    },
+    {
+      "label": "incorrect_binary_search_bound",
+      "description": "Move the low/high bound incorrectly and lose correctness.",
+      "aliases": [
+        "wrong_binary_search_bound"
+      ],
+      "affected_skills": [
+        "binary_search_bounds",
+        "boundary_handling"
+      ],
+      "affected_patterns": [
+        "binary_search",
+        "binary_search_on_answer",
+        "topological_ordering"
+      ]
+    },
+    {
+      "label": "wrong_partitioning",
+      "description": "Split items around the pivot or threshold incorrectly.",
+      "aliases": [],
+      "affected_skills": [
+        "partitioning_logic",
+        "index_management"
+      ],
+      "affected_patterns": [
+        "cyclic_sort",
+        "quickselect",
+        "heap_top_k"
+      ]
+    },
+    {
+      "label": "wrong_sliding_window_update",
+      "description": "Update the window in the wrong order or miss a shrink/expand step.",
+      "aliases": [],
+      "affected_skills": [
+        "window_shrink_expand",
+        "state_tracking"
+      ],
+      "affected_patterns": [
+        "sliding_window_variable",
+        "minimum_window_substring",
+        "longest_substring_without_repeating"
+      ]
+    },
+    {
+      "label": "wrong_prefix_sum_usage",
+      "description": "Misuse cumulative sums or range offsets.",
+      "aliases": [],
+      "affected_skills": [
+        "prefix_sum_construction",
+        "overflow_guarding"
+      ],
+      "affected_patterns": [
+        "subarray_sum",
+        "trapping_rain_water",
+        "dp_linear_sequence"
+      ]
+    },
+    {
+      "label": "incorrect_backtracking_restore",
+      "description": "Fail to restore state after exploring a branch.",
+      "aliases": [],
+      "affected_skills": [
+        "state_tracking",
+        "pruning"
+      ],
+      "affected_patterns": [
+        "backtracking_combinations",
+        "combination_sum",
+        "n_queen"
+      ]
+    },
+    {
+      "label": "graph_traversal_miss",
+      "description": "Skip a node, neighbor, or component during traversal.",
+      "aliases": [],
+      "affected_skills": [
+        "graph_adjacency_traversal",
+        "visited_marking"
+      ],
+      "affected_patterns": [
+        "graph_connected_components",
+        "shortest_path",
+        "graph_union_find_components"
+      ]
+    },
+    {
+      "label": "invalid_topological_order",
+      "description": "Produce an order that violates dependency constraints.",
+      "aliases": [],
+      "affected_skills": [
+        "topological_indegree_tracking",
+        "graph_adjacency_traversal"
+      ],
+      "affected_patterns": [
+        "topological_ordering",
+        "tree_construction"
+      ]
+    },
+    {
+      "label": "wrong_greedy_choice",
+      "description": "Make a locally attractive choice that blocks the optimal outcome.",
+      "aliases": [],
+      "affected_skills": [
+        "ordering_constraints",
+        "state_tracking"
+      ],
+      "affected_patterns": [
+        "buy_and_sell_stock",
+        "jump_game",
+        "meeting_rooms"
+      ]
+    },
+    {
+      "label": "integer_overflow",
+      "description": "Exceed numeric range or fail to guard large accumulations.",
+      "aliases": [],
+      "affected_skills": [
+        "overflow_guarding",
+        "prefix_sum_construction"
+      ],
+      "affected_patterns": [
+        "subarray_sum",
+        "trapping_rain_water",
+        "sql_group_by"
+      ]
+    },
+    {
+      "label": "queue_management_error",
+      "description": "Mismanage queue order, enqueue/dequeue timing, or breadth-first state.",
+      "aliases": [],
+      "affected_skills": [
+        "queue_usage",
+        "state_tracking"
+      ],
+      "affected_patterns": [
+        "tree_level_order",
+        "graph_connected_components",
+        "shortest_path"
+      ]
+    },
+    {
+      "label": "stack_underflow",
+      "description": "Pop from an empty stack or lose nesting context.",
+      "aliases": [],
+      "affected_skills": [
+        "stack_usage",
+        "parentheses_matching"
+      ],
+      "affected_patterns": [
+        "valid_parentheses",
+        "monotonic_stack",
+        "tree_dfs"
+      ]
+    },
+    {
+      "label": "wrong_hash_key",
+      "description": "Use the wrong key or normalization in hash-based logic.",
+      "aliases": [],
+      "affected_skills": [
+        "hash_map_usage",
+        "character_frequency_count"
+      ],
+      "affected_patterns": [
+        "two_sum",
+        "subarray_sum",
+        "longest_consecutive_sequence"
+      ]
+    },
+    {
+      "label": "failed_pruning",
+      "description": "Keep exploring branches that should have been cut.",
+      "aliases": [],
+      "affected_skills": [
+        "pruning",
+        "state_tracking"
+      ],
+      "affected_patterns": [
+        "backtracking_combinations",
+        "combination_sum",
+        "n_queen"
+      ]
+    },
+    {
+      "label": "ordering_error",
+      "description": "Apply updates in the wrong sequence or violate a required order.",
+      "aliases": [],
+      "affected_skills": [
+        "ordering_constraints",
+        "state_tracking"
+      ],
+      "affected_patterns": [
+        "merge_intervals",
+        "meeting_rooms",
+        "sql_window_function"
+      ]
+    },
+    {
+      "label": "missed_visited_mark",
+      "description": "Fail to mark explored states and revisit them repeatedly.",
+      "aliases": [],
+      "affected_skills": [
+        "visited_marking",
+        "graph_cycle_detection"
+      ],
+      "affected_patterns": [
+        "graph_connected_components",
+        "graph_union_find_components",
+        "tree_dfs"
+      ]
+    },
+    {
+      "label": "missing_null_check",
+      "description": "Skip a required empty or absent-value guard.",
+      "aliases": [],
+      "affected_skills": [
+        "null_handling",
+        "edge_case_handling"
+      ],
+      "affected_patterns": [
+        "linked_list_reversal",
+        "tree_construction",
+        "design_lru_cache"
+      ]
+    },
+    {
+      "label": "incorrect_recursive_transition",
+      "description": "Recurse into the wrong subproblem or combine children incorrectly.",
+      "aliases": [],
+      "affected_skills": [
+        "dp_transition_design",
+        "recursion_depth_control"
+      ],
+      "affected_patterns": [
+        "tree_dfs",
+        "lowest_common_ancestor",
+        "word_break"
+      ]
+    },
+    {
+      "label": "incorrect_dp_transition",
+      "description": "Define the wrong recurrence or DP state update.",
+      "aliases": [],
+      "affected_skills": [
+        "dp_transition_design",
+        "tabulation_ordering"
+      ],
+      "affected_patterns": [
+        "dp_linear_sequence",
+        "dp_grid",
+        "dp_interval"
+      ]
+    },
+    {
+      "label": "infinite_loop",
+      "description": "Fail to converge because a pointer, index, or state never moves correctly.",
+      "aliases": [],
+      "affected_skills": [
+        "state_tracking",
+        "pointer_update"
+      ],
+      "affected_patterns": [
+        "two_pointers",
+        "sliding_window_variable",
+        "linked_list_cycle"
+      ]
+    },
+    {
+      "label": "wrong_relaxation_update",
+      "description": "Relax shortest-path edges in the wrong direction or order.",
+      "aliases": [],
+      "affected_skills": [
+        "edge_relaxation",
+        "graph_weight_handling"
+      ],
+      "affected_patterns": [
+        "shortest_path",
+        "all_pairs_shortest_path",
+        "negative_cycle_detection"
+      ]
+    },
+    {
+      "label": "wrong_distance_initialization",
+      "description": "Initialize distances or unreachable values incorrectly.",
+      "aliases": [],
+      "affected_skills": [
+        "distance_initialization",
+        "graph_weight_handling"
+      ],
+      "affected_patterns": [
+        "all_pairs_shortest_path",
+        "shortest_path"
+      ]
+    },
+    {
+      "label": "negative_cycle_missed",
+      "description": "Fail to detect or report a reachable negative-weight cycle.",
+      "aliases": [],
+      "affected_skills": [
+        "negative_cycle_awareness",
+        "edge_relaxation"
+      ],
+      "affected_patterns": [
+        "negative_cycle_detection",
+        "bellman_ford_shortest_path"
+      ]
+    },
+    {
+      "label": "wrong_mst_edge_choice",
+      "description": "Choose the wrong edge when building a spanning tree.",
+      "aliases": [],
+      "affected_skills": [
+        "graph_weight_handling",
+        "graph_component_tracking"
+      ],
+      "affected_patterns": [
+        "minimum_spanning_tree"
+      ]
+    },
+    {
+      "label": "wrong_segment_tree_merge",
+      "description": "Merge or propagate segment-tree node values incorrectly.",
+      "aliases": [],
+      "affected_skills": [
+        "lazy_propagation",
+        "range_update_logic"
+      ],
+      "affected_patterns": [
+        "segment_tree_range_query"
+      ]
+    },
+    {
+      "label": "incorrect_coordinate_compression",
+      "description": "Compress coordinates inconsistently and break index mapping.",
+      "aliases": [],
+      "affected_skills": [
+        "coordinate_compression",
+        "index_management"
+      ],
+      "affected_patterns": [
+        "segment_tree_range_query",
+        "fenwick_prefix_query"
+      ]
+    },
+    {
+      "label": "wrong_reservoir_update",
+      "description": "Update the sample reservoir with the wrong probability or replacement logic.",
+      "aliases": [],
+      "affected_skills": [
+        "reservoir_update",
+        "probabilistic_reasoning"
+      ],
+      "affected_patterns": [
+        "reservoir_sampling"
+      ]
+    },
+    {
+      "label": "wrong_randomized_partition",
+      "description": "Partition or sample randomly in a biased or invalid way.",
+      "aliases": [],
+      "affected_skills": [
+        "randomized_pivoting",
+        "probabilistic_reasoning"
+      ],
+      "affected_patterns": [
+        "reservoir_sampling",
+        "quickselect"
+      ]
+    },
+    {
+      "label": "wrong_bitset_state",
+      "description": "Encode or update bitmask states incorrectly.",
+      "aliases": [],
+      "affected_skills": [
+        "bitset_usage",
+        "state_encoding"
+      ],
+      "affected_patterns": [
+        "bitmask_dp",
+        "sudoku_validation",
+        "n_queen"
+      ]
+    },
+    {
+      "label": "wrong_parent_reconstruction",
+      "description": "Reconstruct parents or paths incorrectly during backtracking or shortest paths.",
+      "aliases": [],
+      "affected_skills": [
+        "tree_dp_subproblem_design",
+        "graph_weight_handling"
+      ],
+      "affected_patterns": [
+        "tree_dp",
+        "shortest_path"
+      ]
+    },
+    {
+      "label": "path_reconstruction_error",
+      "description": "Reconstruct an answer path incorrectly from stored predecessor state.",
+      "aliases": [],
+      "affected_skills": [
+        "state_tracking",
+        "graph_weight_handling"
+      ],
+      "affected_patterns": [
+        "shortest_path",
+        "all_pairs_shortest_path"
+      ]
+    },
+    {
+      "label": "wrong_k_way_merge_order",
+      "description": "Merge multiple sorted streams in the wrong order or with stale pointers.",
+      "aliases": [],
+      "affected_skills": [
+        "k_way_merge_management",
+        "heap_usage"
+      ],
+      "affected_patterns": [
+        "merge_k_sorted_lists"
+      ]
+    },
+    {
+      "label": "incorrect_failure_function",
+      "description": "Prefix-function or failure-link computation is wrong.",
+      "aliases": [],
+      "affected_skills": [
+        "failure_function_construction"
+      ],
+      "affected_patterns": [
+        "string_matching"
+      ]
+    },
+    {
+      "label": "incorrect_palindrome_radius",
+      "description": "Palindrome radius expansion stops too early or overshoots.",
+      "aliases": [],
+      "affected_skills": [
+        "palindrome_radius_expansion"
+      ],
+      "affected_patterns": [
+        "palindrome_manacher"
+      ]
+    },
+    {
+      "label": "wrong_rolling_hash_collision_handling",
+      "description": "Rolling hash collisions or modulus choices are mishandled.",
+      "aliases": [],
+      "affected_skills": [
+        "rolling_hash_collision_control"
+      ],
+      "affected_patterns": [
+        "rolling_hash_search"
+      ]
+    },
+    {
+      "label": "suffix_structure_construction_error",
+      "description": "Suffix array or automaton construction breaks invariants.",
+      "aliases": [],
+      "affected_skills": [
+        "suffix_structure_building"
+      ],
+      "affected_patterns": [
+        "suffix_structure_processing"
+      ]
+    },
+    {
+      "label": "scc_lowlink_error",
+      "description": "Low-link or component bookkeeping is incorrect.",
+      "aliases": [],
+      "affected_skills": [
+        "scc_lowlink_reasoning"
+      ],
+      "affected_patterns": [
+        "strongly_connected_components"
+      ]
+    },
+    {
+      "label": "eulerian_edge_reuse_error",
+      "description": "An edge is reused, skipped, or consumed in the wrong order.",
+      "aliases": [],
+      "affected_skills": [
+        "eulerian_edge_traversal_tracking"
+      ],
+      "affected_patterns": [
+        "eulerian_path_construction"
+      ]
+    },
+    {
+      "label": "wrong_sieve_marking",
+      "description": "Composite marking or prime iteration is incorrect.",
+      "aliases": [],
+      "affected_skills": [
+        "sieve_marking"
+      ],
+      "affected_patterns": [
+        "prime_sieve_factorization"
+      ]
+    },
+    {
+      "label": "prime_factor_missed",
+      "description": "A prime factor or multiplicity is omitted during factorization.",
+      "aliases": [],
+      "affected_skills": [
+        "prime_factor_extraction"
+      ],
+      "affected_patterns": [
+        "prime_sieve_factorization"
+      ]
+    },
+    {
+      "label": "wrong_matrix_exponent_order",
+      "description": "Matrix multiplication order or power decomposition is incorrect.",
+      "aliases": [],
+      "affected_skills": [
+        "matrix_power_decomposition"
+      ],
+      "affected_patterns": [
+        "matrix_exponentiation_dp"
+      ]
+    },
+    {
+      "label": "merge_sort_split_error",
+      "description": "Recursive split or merge step loses ordering or elements.",
+      "aliases": [],
+      "affected_skills": [
+        "merge_sort_split_merge"
+      ],
+      "affected_patterns": [
+        "sorting_and_order_statistics"
+      ]
+    },
+    {
+      "label": "bucket_assignment_error",
+      "description": "Bucket ranges or insertion logic are incorrect.",
+      "aliases": [],
+      "affected_skills": [
+        "bucket_bound_assignment"
+      ],
+      "affected_patterns": [
+        "sorting_and_order_statistics"
+      ]
+    },
+    {
+      "label": "deque_window_mismanagement",
+      "description": "Stale elements are not removed or candidates are misplaced in a deque window.",
+      "aliases": [],
+      "affected_skills": [
+        "deque_window_management"
+      ],
+      "affected_patterns": [
+        "deque_window_processing",
+        "monotonic_queue_window"
+      ]
+    },
+    {
+      "label": "line_sweep_event_order_error",
+      "description": "Events are processed in the wrong sweep order.",
+      "aliases": [],
+      "affected_skills": [
+        "line_sweep_event_sorting"
+      ],
+      "affected_patterns": [
+        "line_sweep_intervals"
+      ]
+    },
+    {
+      "label": "wrong_orientation_check",
+      "description": "Cross-product or orientation sign is computed incorrectly.",
+      "aliases": [],
+      "affected_skills": [
+        "cross_product_orientation"
+      ],
+      "affected_patterns": [
+        "convex_hull_geometry"
+      ]
+    },
+    {
+      "label": "wrong_cache_eviction",
+      "description": "The cache evicts the wrong entry or updates recency or frequency incorrectly.",
+      "aliases": [],
+      "affected_skills": [
+        "cache_eviction_policy"
+      ],
+      "affected_patterns": [
+        "cache_design"
+      ]
+    },
+    {
+      "label": "heap_rebalance_error",
+      "description": "Heap sizes or ordering are not restored after updates.",
+      "aliases": [],
+      "affected_skills": [
+        "heap_rebalancing"
+      ],
+      "affected_patterns": [
+        "data_stream_median"
+      ]
+    },
+    {
+      "label": "order_statistic_misalignment",
+      "description": "Rank or order statistic queries are returned from the wrong position.",
+      "aliases": [],
+      "affected_skills": [
+        "order_statistic_querying"
+      ],
+      "affected_patterns": [
+        "sorting_and_order_statistics"
+      ]
+    },
+    {
+      "label": "wrong_modular_arithmetic",
+      "description": "Modulo arithmetic or overflow handling is incorrect.",
+      "aliases": [],
+      "affected_skills": [
+        "modular_arithmetic_guarding"
+      ],
+      "affected_patterns": [
+        "rolling_hash_search",
+        "prime_sieve_factorization",
+        "matrix_exponentiation_dp"
+      ]
+    },
+    {
+      "label": "kadane_state_reset_error",
+      "description": "Running subarray state is reset at the wrong time or not at all.",
+      "aliases": [],
+      "affected_skills": [
+        "kadane_running_max_tracking"
+      ],
+      "affected_patterns": [
+        "kadane_max_subarray"
+      ]
+    },
+    {
+      "label": "monotonic_queue_invariant_break",
+      "description": "The monotonic order or stale expiration invariant is violated.",
+      "aliases": [],
+      "affected_skills": [
+        "monotonic_queue_invariant"
+      ],
+      "affected_patterns": [
+        "monotonic_queue_window"
+      ]
+    }
+  ],
+  "pattern_clusters": [
+    {
+      "label": "pair_and_sum",
+      "description": "Pairing, k-sum, and contiguous-sum style reasoning.",
+      "patterns": [
+        "two_sum",
+        "three_sum",
+        "subarray_sum",
+        "longest_subarray"
+      ]
+    },
+    {
+      "label": "sliding_window_strings",
+      "description": "Window maintenance over strings or contiguous sequences.",
+      "patterns": [
+        "sliding_window_variable",
+        "longest_substring_without_repeating",
+        "minimum_window_substring",
+        "word_break"
+      ]
+    },
+    {
+      "label": "linked_list_pointer_work",
+      "description": "Pointer-heavy linked-list manipulation and cycle logic.",
+      "patterns": [
+        "linked_list_reversal",
+        "linked_list_cycle",
+        "fast_slow_pointer"
+      ]
+    },
+    {
+      "label": "tree_traversal_and_construction",
+      "description": "Tree traversal, reconstruction, and ancestor reasoning.",
+      "patterns": [
+        "tree_level_order",
+        "tree_dfs",
+        "bst_validation",
+        "lowest_common_ancestor",
+        "tree_construction"
+      ]
+    },
+    {
+      "label": "graph_connectivity_and_paths",
+      "description": "Connectivity, ordering, and shortest-path style graph problems.",
+      "patterns": [
+        "graph_connected_components",
+        "shortest_path",
+        "topological_ordering",
+        "graph_union_find_components"
+      ]
+    },
+    {
+      "label": "interval_scheduling_and_merging",
+      "description": "Merge, overlap, and schedule across ranges.",
+      "patterns": [
+        "merge_intervals",
+        "meeting_rooms"
+      ]
+    },
+    {
+      "label": "dynamic_programming_core",
+      "description": "Core DP families that recur across the dataset.",
+      "patterns": [
+        "dp_linear_sequence",
+        "dp_grid",
+        "dp_interval"
+      ]
+    },
+    {
+      "label": "backtracking_and_combinatorics",
+      "description": "Search over combinations, subsets, and constrained placements.",
+      "patterns": [
+        "backtracking_combinations",
+        "subset_sum",
+        "combination_sum",
+        "n_queen",
+        "sudoku_validation"
+      ]
+    },
+    {
+      "label": "string_and_stack_patterns",
+      "description": "Delimiter matching, palindrome, and string searching patterns.",
+      "patterns": [
+        "palindrome_check",
+        "valid_parentheses",
+        "string_matching",
+        "monotonic_stack"
+      ]
+    },
+    {
+      "label": "design_and_state",
+      "description": "Problems where state structure and invariants dominate the solution.",
+      "patterns": [
+        "design_lru_cache",
+        "design_median_finder",
+        "buy_and_sell_stock",
+        "jump_game"
+      ]
+    },
+    {
+      "label": "array_rearrangement",
+      "description": "Array reshaping, ordering, and placement-style patterns.",
+      "patterns": [
+        "cyclic_sort",
+        "matrix_spiral_traversal",
+        "matrix_rotation",
+        "heap_top_k",
+        "trapping_rain_water",
+        "longest_consecutive_sequence"
+      ]
+    },
+    {
+      "label": "string_algorithms_and_palindromes",
+      "description": "Pattern family for matching, palindromes, and suffix-based string work.",
+      "patterns": [
+        "string_matching",
+        "palindrome_manacher",
+        "rolling_hash_search",
+        "suffix_structure_processing"
+      ]
+    },
+    {
+      "label": "advanced_graph_algorithms",
+      "description": "Directed and weighted graph decompositions beyond simple traversal.",
+      "patterns": [
+        "strongly_connected_components",
+        "eulerian_path_construction",
+        "graph_connected_components",
+        "shortest_path"
+      ]
+    },
+    {
+      "label": "advanced_number_theory_and_math",
+      "description": "Prime, modular, recurrence, and geometry-adjacent math routines.",
+      "patterns": [
+        "prime_sieve_factorization",
+        "matrix_exponentiation_dp",
+        "advanced_bit_tricks",
+        "convex_hull_geometry"
+      ]
+    },
+    {
+      "label": "streaming_and_cache_design",
+      "description": "Online processing with bounded memory and eviction policies.",
+      "patterns": [
+        "cache_design",
+        "data_stream_median",
+        "deque_window_processing",
+        "monotonic_queue_window"
+      ]
+    },
+    {
+      "label": "sorting_and_order_statistics",
+      "description": "Sorting, ranking, and selection families.",
+      "patterns": [
+        "sorting_and_order_statistics",
+        "kadane_max_subarray"
+      ]
+    },
+    {
+      "label": "geometry_and_line_sweep",
+      "description": "Sweep-line and computational geometry problem families.",
+      "patterns": [
+        "line_sweep_intervals",
+        "convex_hull_geometry"
+      ]
+    },
+    {
+      "label": "subarray_and_prefix_variants",
+      "description": "Prefix, suffix, and subarray accumulation families.",
+      "patterns": [
+        "prefix_suffix_combination",
+        "kadane_max_subarray"
+      ]
+    },
+    {
+      "label": "advanced_data_structures",
+      "description": "Specialized structures such as ordered sets, heaps, and monotonic queues.",
+      "patterns": [
+        "deque_window_processing",
+        "monotonic_queue_window",
+        "data_stream_median",
+        "cache_design"
+      ]
+    }
+  ],
+  "topic_hierarchy": [
+    {
+      "topic": "dsa_foundations",
+      "description": "Top-level learning map for the recommendation system.",
+      "parent": null,
+      "children": [
+        "arrays_and_strings",
+        "linked_structures",
+        "trees_and_heaps",
+        "graphs_and_search",
+        "searching_sorting_ranges",
+        "intervals_and_ranges",
+        "dynamic_programming_and_backtracking",
+        "math_bit_sql_design"
+      ],
+      "contains_domains": [
+        "data_structure",
+        "array",
+        "string",
+        "linked_list",
+        "stack_queue",
+        "hash_table",
+        "tree",
+        "binary_tree",
+        "binary_search_tree",
+        "graph",
+        "matrix",
+        "interval",
+        "heap",
+        "trie",
+        "math",
+        "bit_manipulation",
+        "combinatorics",
+        "number_theory",
+        "design",
+        "sql",
+        "simulation"
+      ],
+      "contains_algorithms": [
+        "sorting",
+        "binary_search",
+        "two_pointers",
+        "sliding_window_variable",
+        "prefix_sum",
+        "depth_first_search",
+        "breadth_first_search",
+        "topological_sort",
+        "union_find",
+        "dynamic_programming_bottom_up",
+        "backtracking",
+        "heap_priority_queue"
+      ],
+      "contains_patterns": [
+        "two_sum",
+        "subarray_sum",
+        "sliding_window_variable",
+        "tree_level_order",
+        "graph_connected_components",
+        "merge_intervals",
+        "dp_linear_sequence",
+        "backtracking_combinations",
+        "design_lru_cache",
+        "sql_window_function"
+      ],
+      "contains_micro_skills": [
+        "boundary_handling",
+        "index_management",
+        "pointer_update",
+        "state_tracking",
+        "invariant_maintenance",
+        "dp_transition_design",
+        "graph_adjacency_traversal",
+        "heap_usage",
+        "sql_grouping_reasoning"
+      ]
+    },
+    {
+      "topic": "arrays_and_strings",
+      "description": "Array and string mechanics, including windowing and indexing.",
+      "parent": "dsa_foundations",
+      "children": [
+        "pair_and_sum",
+        "sliding_window_strings",
+        "string_algorithms",
+        "prefix_suffix_variants"
+      ],
+      "contains_domains": [
+        "array",
+        "string",
+        "matrix",
+        "hash_table",
+        "interval"
+      ],
+      "contains_algorithms": [
+        "sorting",
+        "two_pointers",
+        "sliding_window_variable",
+        "prefix_sum",
+        "hash_map_lookup",
+        "matrix_traversal",
+        "binary_search",
+        "kmp_string_matching",
+        "rolling_hash_string_matching",
+        "manacher_palindrome_radius"
+      ],
+      "contains_patterns": [
+        "two_sum",
+        "subarray_sum",
+        "longest_substring_without_repeating",
+        "minimum_window_substring",
+        "matrix_spiral_traversal",
+        "palindrome_check",
+        "three_sum",
+        "anagram_detection",
+        "string_matching",
+        "palindrome_manacher",
+        "rolling_hash_search",
+        "prefix_suffix_combination"
+      ],
+      "contains_micro_skills": [
+        "index_management",
+        "string_indexing",
+        "prefix_sum_construction",
+        "two_pointer_coordination",
+        "window_shrink_expand",
+        "failure_function_construction",
+        "palindrome_radius_expansion",
+        "rolling_hash_collision_control"
+      ]
+    },
+    {
+      "topic": "linked_structures",
+      "description": "Linked lists, stacks, queues, and pointer-heavy state.",
+      "parent": "dsa_foundations",
+      "children": [
+        "linked_list_pointer_work",
+        "design_and_state"
+      ],
+      "contains_domains": [
+        "linked_list",
+        "stack_queue",
+        "hash_table",
+        "design"
+      ],
+      "contains_algorithms": [
+        "depth_first_search",
+        "breadth_first_search",
+        "hash_map_lookup",
+        "linked_list_manipulation",
+        "deque",
+        "lru_cache",
+        "lfu_cache",
+        "min_stack",
+        "max_stack"
+      ],
+      "contains_patterns": [
+        "linked_list_reversal",
+        "linked_list_cycle",
+        "fast_slow_pointer",
+        "valid_parentheses",
+        "cache_design",
+        "deque_window_processing"
+      ],
+      "contains_micro_skills": [
+        "pointer_update",
+        "linked_list_pointer_update",
+        "stack_usage",
+        "queue_usage",
+        "sentinel_dummy_node",
+        "cache_eviction_policy",
+        "deque_window_management"
+      ]
+    },
+    {
+      "topic": "trees_and_heaps",
+      "description": "Tree traversal, BST reasoning, and heap-based selection.",
+      "parent": "dsa_foundations",
+      "children": [
+        "tree_traversal_and_construction",
+        "heap_and_priority_queue",
+        "trie_and_prefix"
+      ],
+      "contains_domains": [
+        "tree",
+        "binary_tree",
+        "binary_search_tree",
+        "heap",
+        "trie"
+      ],
+      "contains_algorithms": [
+        "tree_traversal",
+        "breadth_first_search",
+        "depth_first_search",
+        "heap_priority_queue",
+        "trie_search",
+        "median_of_data_stream",
+        "ordered_set"
+      ],
+      "contains_patterns": [
+        "tree_level_order",
+        "tree_dfs",
+        "bst_validation",
+        "lowest_common_ancestor",
+        "tree_construction",
+        "heap_top_k",
+        "trie_prefix_search",
+        "data_stream_median"
+      ],
+      "contains_micro_skills": [
+        "tree_node_access",
+        "heap_usage",
+        "queue_usage",
+        "recursion_depth_control",
+        "heap_rebalancing",
+        "order_statistic_querying"
+      ]
+    },
+    {
+      "topic": "graphs_and_search",
+      "description": "Connectivity, traversal, ordering, and shortest-path problems.",
+      "parent": "dsa_foundations",
+      "children": [
+        "graph_connectivity_and_paths",
+        "advanced_graph_algorithms"
+      ],
+      "contains_domains": [
+        "graph",
+        "disjoint_set",
+        "probability",
+        "randomized"
+      ],
+      "contains_algorithms": [
+        "depth_first_search",
+        "breadth_first_search",
+        "topological_sort",
+        "union_find",
+        "shortest_path",
+        "dijkstra_shortest_path",
+        "bellman_ford_shortest_path",
+        "floyd_warshall_all_pairs_shortest_path",
+        "tarjan_scc",
+        "kosaraju_scc",
+        "eulerian_path"
+      ],
+      "contains_patterns": [
+        "graph_connected_components",
+        "shortest_path",
+        "topological_ordering",
+        "graph_union_find_components",
+        "strongly_connected_components",
+        "eulerian_path_construction"
+      ],
+      "contains_micro_skills": [
+        "graph_adjacency_traversal",
+        "visited_marking",
+        "topological_indegree_tracking",
+        "graph_cycle_detection",
+        "graph_weight_handling",
+        "edge_relaxation",
+        "scc_lowlink_reasoning",
+        "eulerian_edge_traversal_tracking"
+      ]
+    },
+    {
+      "topic": "searching_sorting_ranges",
+      "description": "Binary search, ordering, partitions, and range reasoning.",
+      "parent": "dsa_foundations",
+      "children": [
+        "binary_search_patterns",
+        "interval_scheduling_and_merging",
+        "sorting_and_order_statistics",
+        "geometry_and_line_sweep"
+      ],
+      "contains_domains": [
+        "array",
+        "interval",
+        "math",
+        "ordered_map",
+        "segment_tree",
+        "binary_indexed_tree",
+        "ordered_set"
+      ],
+      "contains_algorithms": [
+        "binary_search",
+        "binary_search_on_answer",
+        "sorting",
+        "ordered_map",
+        "quickselect",
+        "merge_sort",
+        "counting_sort",
+        "bucket_sort",
+        "line_sweep",
+        "kadane_algorithm"
+      ],
+      "contains_patterns": [
+        "merge_intervals",
+        "meeting_rooms",
+        "cyclic_sort",
+        "buy_and_sell_stock",
+        "jump_game",
+        "longest_consecutive_sequence",
+        "binary_search_rotated_array",
+        "sorting_and_order_statistics",
+        "line_sweep_intervals",
+        "kadane_max_subarray"
+      ],
+      "contains_micro_skills": [
+        "binary_search_bounds",
+        "ordering_constraints",
+        "partitioning_logic",
+        "duplicate_handling",
+        "boundary_handling",
+        "index_management",
+        "line_sweep_event_sorting",
+        "bucket_bound_assignment"
+      ]
+    },
+    {
+      "topic": "dynamic_programming_and_backtracking",
+      "description": "State recurrence, memoization, and exhaustive search with pruning.",
+      "parent": "dsa_foundations",
+      "children": [
+        "dynamic_programming_core",
+        "backtracking_and_combinatorics",
+        "state_compression_dp"
+      ],
+      "contains_domains": [
+        "combinatorics",
+        "number_theory",
+        "design",
+        "simulation",
+        "bit_manipulation",
+        "matrix"
+      ],
+      "contains_algorithms": [
+        "dynamic_programming_top_down",
+        "dynamic_programming_bottom_up",
+        "memoization",
+        "backtracking",
+        "greedy_choice",
+        "bitmask_dp",
+        "digit_dp",
+        "matrix_exponentiation",
+        "zero_one_bfs"
+      ],
+      "contains_patterns": [
+        "dp_linear_sequence",
+        "dp_grid",
+        "dp_interval",
+        "backtracking_combinations",
+        "word_break",
+        "combination_sum",
+        "subset_sum",
+        "n_queen",
+        "sudoku_validation",
+        "bitmask_dp",
+        "matrix_exponentiation_dp"
+      ],
+      "contains_micro_skills": [
+        "dp_transition_design",
+        "memoization_table_design",
+        "pruning",
+        "state_reset",
+        "base_case_selection",
+        "tabulation_ordering",
+        "state_encoding",
+        "subset_enumeration",
+        "modular_arithmetic_guarding"
+      ]
+    },
+    {
+      "topic": "math_bit_sql_design",
+      "description": "Math, bit tricks, SQL, and stateful design problems.",
+      "parent": "dsa_foundations",
+      "children": [
+        "advanced_number_theory_and_math",
+        "bit_manipulation_patterns",
+        "sql_patterns",
+        "streaming_and_cache_design"
+      ],
+      "contains_domains": [
+        "math",
+        "bit_manipulation",
+        "number_theory",
+        "sql",
+        "design",
+        "simulation",
+        "geometry",
+        "probability",
+        "randomized"
+      ],
+      "contains_algorithms": [
+        "bit_manipulation",
+        "state_machine",
+        "simulation",
+        "ordered_map",
+        "sieve_of_eratosthenes",
+        "prime_factorization",
+        "convex_hull",
+        "median_of_data_stream",
+        "lru_cache",
+        "lfu_cache"
+      ],
+      "contains_patterns": [
+        "design_lru_cache",
+        "design_median_finder",
+        "sql_group_by",
+        "sql_window_function",
+        "trapping_rain_water",
+        "advanced_bit_tricks",
+        "prime_sieve_factorization",
+        "convex_hull_geometry",
+        "cache_design",
+        "data_stream_median"
+      ],
+      "contains_micro_skills": [
+        "bitmask_operations",
+        "sql_grouping_reasoning",
+        "overflow_guarding",
+        "null_handling",
+        "sieve_marking",
+        "prime_factor_extraction",
+        "cross_product_orientation",
+        "cache_eviction_policy"
+      ]
+    },
+    {
+      "topic": "pair_and_sum",
+      "description": "Problems that rely on fixed-size or complement-based pairing.",
+      "parent": "dsa_foundations > arrays_and_strings",
+      "children": [],
+      "contains_domains": [
+        "array",
+        "hash_table"
+      ],
+      "contains_algorithms": [
+        "two_pointers",
+        "hash_map_lookup"
+      ],
+      "contains_patterns": [
+        "two_sum",
+        "subarray_sum"
+      ],
+      "contains_micro_skills": [
+        "index_management",
+        "hash_map_usage"
+      ]
+    },
+    {
+      "topic": "sliding_window_strings",
+      "description": "String windows, anagrams, and substring constraints.",
+      "parent": "dsa_foundations > arrays_and_strings",
+      "children": [],
+      "contains_domains": [
+        "string",
+        "hash_table"
+      ],
+      "contains_algorithms": [
+        "sliding_window_variable",
+        "prefix_sum"
+      ],
+      "contains_patterns": [
+        "longest_substring_without_repeating",
+        "minimum_window_substring",
+        "anagram_detection"
+      ],
+      "contains_micro_skills": [
+        "window_shrink_expand",
+        "character_frequency_count"
+      ]
+    },
+    {
+      "topic": "string_algorithms",
+      "description": "Pattern matching, palindromes, and suffix structures.",
+      "parent": "dsa_foundations > arrays_and_strings",
+      "children": [],
+      "contains_domains": [
+        "string"
+      ],
+      "contains_algorithms": [
+        "kmp_string_matching",
+        "z_algorithm_string_matching",
+        "manacher_palindrome_radius",
+        "rolling_hash_string_matching"
+      ],
+      "contains_patterns": [
+        "string_matching",
+        "palindrome_manacher",
+        "rolling_hash_search"
+      ],
+      "contains_micro_skills": [
+        "failure_function_construction",
+        "palindrome_radius_expansion",
+        "rolling_hash_collision_control"
+      ]
+    },
+    {
+      "topic": "prefix_suffix_variants",
+      "description": "Prefix and suffix accumulation or combination problems.",
+      "parent": "dsa_foundations > arrays_and_strings",
+      "children": [],
+      "contains_domains": [
+        "array",
+        "string"
+      ],
+      "contains_algorithms": [
+        "prefix_sum",
+        "kadane_algorithm"
+      ],
+      "contains_patterns": [
+        "prefix_suffix_combination",
+        "kadane_max_subarray"
+      ],
+      "contains_micro_skills": [
+        "prefix_sum_construction",
+        "kadane_running_max_tracking"
+      ]
+    },
+    {
+      "topic": "graph_connectivity_and_paths",
+      "description": "Connectivity, traversal, and shortest path problems.",
+      "parent": "dsa_foundations > graphs_and_search",
+      "children": [],
+      "contains_domains": [
+        "graph",
+        "disjoint_set"
+      ],
+      "contains_algorithms": [
+        "breadth_first_search",
+        "depth_first_search",
+        "union_find",
+        "dijkstra_shortest_path",
+        "bellman_ford_shortest_path"
+      ],
+      "contains_patterns": [
+        "graph_connected_components",
+        "shortest_path",
+        "graph_union_find_components"
+      ],
+      "contains_micro_skills": [
+        "graph_adjacency_traversal",
+        "visited_marking",
+        "edge_relaxation"
+      ]
+    },
+    {
+      "topic": "advanced_graph_algorithms",
+      "description": "SCC, Eulerian, and advanced directed-graph families.",
+      "parent": "dsa_foundations > graphs_and_search",
+      "children": [],
+      "contains_domains": [
+        "graph"
+      ],
+      "contains_algorithms": [
+        "tarjan_scc",
+        "kosaraju_scc",
+        "eulerian_path",
+        "floyd_warshall_all_pairs_shortest_path"
+      ],
+      "contains_patterns": [
+        "strongly_connected_components",
+        "eulerian_path_construction"
+      ],
+      "contains_micro_skills": [
+        "scc_lowlink_reasoning",
+        "eulerian_edge_traversal_tracking"
+      ]
+    },
+    {
+      "topic": "binary_search_patterns",
+      "description": "Classic and answer-space binary search variants.",
+      "parent": "dsa_foundations > searching_sorting_ranges",
+      "children": [],
+      "contains_domains": [
+        "array",
+        "matrix",
+        "interval"
+      ],
+      "contains_algorithms": [
+        "binary_search",
+        "binary_search_on_answer"
+      ],
+      "contains_patterns": [
+        "binary_search_rotated_array"
+      ],
+      "contains_micro_skills": [
+        "binary_search_bounds",
+        "boundary_handling"
+      ]
+    },
+    {
+      "topic": "interval_scheduling_and_merging",
+      "description": "Merging, scheduling, and overlap reasoning.",
+      "parent": "dsa_foundations > searching_sorting_ranges",
+      "children": [],
+      "contains_domains": [
+        "interval"
+      ],
+      "contains_algorithms": [
+        "merge_intervals",
+        "line_sweep"
+      ],
+      "contains_patterns": [
+        "merge_intervals",
+        "meeting_rooms",
+        "line_sweep_intervals"
+      ],
+      "contains_micro_skills": [
+        "boundary_handling",
+        "line_sweep_event_sorting"
+      ]
+    },
+    {
+      "topic": "sorting_and_order_statistics",
+      "description": "Sorting, ranking, and selection families.",
+      "parent": "dsa_foundations > searching_sorting_ranges",
+      "children": [],
+      "contains_domains": [
+        "array",
+        "ordered_set"
+      ],
+      "contains_algorithms": [
+        "merge_sort",
+        "counting_sort",
+        "bucket_sort",
+        "ordered_set"
+      ],
+      "contains_patterns": [
+        "sorting_and_order_statistics"
+      ],
+      "contains_micro_skills": [
+        "bucket_bound_assignment",
+        "order_statistic_querying"
+      ]
+    },
+    {
+      "topic": "geometry_and_line_sweep",
+      "description": "Sweep-line and computational geometry families.",
+      "parent": "dsa_foundations > searching_sorting_ranges",
+      "children": [],
+      "contains_domains": [
+        "geometry",
+        "interval"
+      ],
+      "contains_algorithms": [
+        "line_sweep",
+        "convex_hull"
+      ],
+      "contains_patterns": [
+        "line_sweep_intervals",
+        "convex_hull_geometry"
+      ],
+      "contains_micro_skills": [
+        "line_sweep_event_sorting",
+        "cross_product_orientation"
+      ]
+    },
+    {
+      "topic": "dynamic_programming_core",
+      "description": "State transitions, memoization, and tabulation.",
+      "parent": "dsa_foundations > dynamic_programming_and_backtracking",
+      "children": [],
+      "contains_domains": [
+        "array",
+        "matrix"
+      ],
+      "contains_algorithms": [
+        "dynamic_programming_top_down",
+        "dynamic_programming_bottom_up"
+      ],
+      "contains_patterns": [
+        "dp_linear_sequence",
+        "dp_grid",
+        "dp_interval"
+      ],
+      "contains_micro_skills": [
+        "dp_transition_design",
+        "memoization_table_design"
+      ]
+    },
+    {
+      "topic": "backtracking_and_combinatorics",
+      "description": "Search, prune, and enumerate combinations and placements.",
+      "parent": "dsa_foundations > dynamic_programming_and_backtracking",
+      "children": [],
+      "contains_domains": [
+        "combinatorics"
+      ],
+      "contains_algorithms": [
+        "backtracking"
+      ],
+      "contains_patterns": [
+        "backtracking_combinations"
+      ],
+      "contains_micro_skills": [
+        "pruning",
+        "duplicate_handling"
+      ]
+    },
+    {
+      "topic": "state_compression_dp",
+      "description": "Bitmask and compact-state dynamic programming.",
+      "parent": "dsa_foundations > dynamic_programming_and_backtracking",
+      "children": [],
+      "contains_domains": [
+        "bit_manipulation"
+      ],
+      "contains_algorithms": [
+        "bitmask_dp"
+      ],
+      "contains_patterns": [
+        "bitmask_dp"
+      ],
+      "contains_micro_skills": [
+        "state_encoding",
+        "bitmask_operations"
+      ]
+    },
+    {
+      "topic": "advanced_number_theory_and_math",
+      "description": "Primes, modular arithmetic, and recurrence acceleration.",
+      "parent": "dsa_foundations > math_bit_sql_design",
+      "children": [],
+      "contains_domains": [
+        "math",
+        "number_theory"
+      ],
+      "contains_algorithms": [
+        "sieve_of_eratosthenes",
+        "prime_factorization",
+        "matrix_exponentiation"
+      ],
+      "contains_patterns": [
+        "prime_sieve_factorization",
+        "matrix_exponentiation_dp"
+      ],
+      "contains_micro_skills": [
+        "sieve_marking",
+        "modular_arithmetic_guarding"
+      ]
+    },
+    {
+      "topic": "bit_manipulation_patterns",
+      "description": "Bitwise masks, subsets, and binary reasoning.",
+      "parent": "dsa_foundations > math_bit_sql_design",
+      "children": [],
+      "contains_domains": [
+        "bit_manipulation"
+      ],
+      "contains_algorithms": [
+        "bit_manipulation",
+        "bitmask_dp"
+      ],
+      "contains_patterns": [
+        "advanced_bit_tricks"
+      ],
+      "contains_micro_skills": [
+        "bitmask_operations",
+        "state_encoding"
+      ]
+    },
+    {
+      "topic": "sql_patterns",
+      "description": "Group-by and window-function query reasoning.",
+      "parent": "dsa_foundations > math_bit_sql_design",
+      "children": [],
+      "contains_domains": [
+        "sql"
+      ],
+      "contains_algorithms": [
+        "sql_group_by",
+        "sql_window_function"
+      ],
+      "contains_patterns": [
+        "sql_group_by",
+        "sql_window_function"
+      ],
+      "contains_micro_skills": [
+        "sql_grouping_reasoning"
+      ]
+    },
+    {
+      "topic": "streaming_and_cache_design",
+      "description": "Online maintenance, eviction, and bounded-memory design.",
+      "parent": "dsa_foundations > math_bit_sql_design",
+      "children": [],
+      "contains_domains": [
+        "design",
+        "stack_queue"
+      ],
+      "contains_algorithms": [
+        "lru_cache",
+        "lfu_cache",
+        "median_of_data_stream",
+        "deque",
+        "monotonic_queue"
+      ],
+      "contains_patterns": [
+        "cache_design",
+        "data_stream_median",
+        "deque_window_processing"
+      ],
+      "contains_micro_skills": [
+        "cache_eviction_policy",
+        "heap_rebalancing",
+        "deque_window_management"
+      ]
+    }
+  ],
+  "learning_targets": [
+    {
+      "label": "practice_two_pointers",
+      "description": "Strengthen paired cursor movement on ordered data.",
+      "target_type": "algorithm",
+      "target_label": "two_pointers"
+    },
+    {
+      "label": "practice_sliding_window",
+      "description": "Improve window expand/shrink reasoning.",
+      "target_type": "algorithm",
+      "target_label": "sliding_window_variable"
+    },
+    {
+      "label": "review_boundary_handling",
+      "description": "Reduce boundary and off-by-one mistakes.",
+      "target_type": "micro_skill",
+      "target_label": "boundary_handling"
+    },
+    {
+      "label": "learn_prefix_sum",
+      "description": "Use cumulative totals for contiguous-range logic.",
+      "target_type": "algorithm",
+      "target_label": "prefix_sum"
+    },
+    {
+      "label": "practice_tree_traversal",
+      "description": "Build fluency in level-order and depth-first tree reasoning.",
+      "target_type": "pattern",
+      "target_label": "tree_level_order"
+    },
+    {
+      "label": "practice_graph_connectivity",
+      "description": "Learn to find connected components and traversals reliably.",
+      "target_type": "pattern",
+      "target_label": "graph_connected_components"
+    },
+    {
+      "label": "strengthen_dp_transitions",
+      "description": "Make recurrence updates and state transitions cleaner.",
+      "target_type": "micro_skill",
+      "target_label": "dp_transition_design"
+    },
+    {
+      "label": "practice_backtracking_pruning",
+      "description": "Cut impossible branches earlier and restore state correctly.",
+      "target_type": "micro_skill",
+      "target_label": "pruning"
+    },
+    {
+      "label": "learn_heap_selection",
+      "description": "Use heaps for repeated top-k and streaming extreme values.",
+      "target_type": "algorithm",
+      "target_label": "heap_priority_queue"
+    },
+    {
+      "label": "learn_interval_merging",
+      "description": "Strengthen overlap reasoning and schedule compression.",
+      "target_type": "pattern",
+      "target_label": "merge_intervals"
+    },
+    {
+      "label": "recover_from_state_errors",
+      "description": "Target mistakes caused by broken state transitions.",
+      "target_type": "failure_type",
+      "target_label": "incorrect_state_transition"
+    },
+    {
+      "label": "learn_sql_windows",
+      "description": "Practice rank, running, and partitioned window queries.",
+      "target_type": "pattern",
+      "target_label": "sql_window_function"
+    },
+    {
+      "label": "practice_string_matching",
+      "description": "Learn how to align and compare pattern strings efficiently.",
+      "target_type": "pattern",
+      "target_label": "string_matching"
+    },
+    {
+      "label": "practice_palindromes",
+      "description": "Strengthen palindrome reasoning, center expansion, and symmetry handling.",
+      "target_type": "pattern",
+      "target_label": "palindrome_manacher"
+    },
+    {
+      "label": "practice_scc",
+      "description": "Review strongly connected component decomposition and low-link reasoning.",
+      "target_type": "pattern",
+      "target_label": "strongly_connected_components"
+    },
+    {
+      "label": "practice_eulerian_paths",
+      "description": "Learn to build paths that consume every edge exactly once.",
+      "target_type": "pattern",
+      "target_label": "eulerian_path_construction"
+    },
+    {
+      "label": "practice_number_theory",
+      "description": "Review primes, factors, modular arithmetic, and recurrence acceleration.",
+      "target_type": "pattern",
+      "target_label": "prime_sieve_factorization"
+    },
+    {
+      "label": "practice_cache_design",
+      "description": "Reinforce cache state, eviction, and update logic.",
+      "target_type": "pattern",
+      "target_label": "cache_design"
+    },
+    {
+      "label": "practice_data_streams",
+      "description": "Practice online maintenance of statistics from a stream.",
+      "target_type": "pattern",
+      "target_label": "data_stream_median"
+    },
+    {
+      "label": "practice_order_statistics",
+      "description": "Strengthen rank, selection, and sorted-container reasoning.",
+      "target_type": "pattern",
+      "target_label": "sorting_and_order_statistics"
+    },
+    {
+      "label": "practice_geometry",
+      "description": "Reinforce geometric orientation and sweep reasoning.",
+      "target_type": "pattern",
+      "target_label": "convex_hull_geometry"
+    },
+    {
+      "label": "practice_monotonic_queue",
+      "description": "Learn monotonic deque maintenance for sliding windows.",
+      "target_type": "pattern",
+      "target_label": "monotonic_queue_window"
+    },
+    {
+      "label": "practice_sorting",
+      "description": "Strengthen comparison, counting, and bucket-based sorting.",
+      "target_type": "algorithm",
+      "target_label": "merge_sort"
+    },
+    {
+      "label": "practice_zero_one_bfs",
+      "description": "Review shortest paths with deque-based 0-1 BFS.",
+      "target_type": "algorithm",
+      "target_label": "zero_one_bfs"
+    },
+    {
+      "label": "linked_list_basics",
+      "description": "Rebuild the basics of pointer manipulation and node rewiring.",
+      "target_type": "domain",
+      "target_label": "linked_list"
+    },
+    {
+      "label": "bit_manipulation_basics",
+      "description": "Review masks, shifts, and bitwise reasoning from first principles.",
+      "target_type": "algorithm",
+      "target_label": "bit_manipulation"
+    }
+  ],
+  "problem_roles": [
+    {
+      "label": "first_exposure",
+      "description": "Introduce a concept or pattern for the first time."
+    },
+    {
+      "label": "guided_practice",
+      "description": "Practice with support and strong hints."
+    },
+    {
+      "label": "reinforcement",
+      "description": "Reinforce a known concept without adding much novelty."
+    },
+    {
+      "label": "review",
+      "description": "Revisit a learned topic after a gap."
+    },
+    {
+      "label": "recovery",
+      "description": "Rebuild confidence after a failure or weak attempt."
+    },
+    {
+      "label": "challenge",
+      "description": "Stretch the learner with higher difficulty or composition."
+    },
+    {
+      "label": "assessment",
+      "description": "Check mastery and transfer without heavy scaffolding."
+    },
+    {
+      "label": "diagnostic",
+      "description": "Use the problem to diagnose a specific weakness."
+    },
+    {
+      "label": "warmup",
+      "description": "Use the problem as a light warmup or re-entry task."
+    },
+    {
+      "label": "benchmark",
+      "description": "Use the problem as a calibration or baseline test."
+    }
+  ],
+  "problem_traits": [
+    {
+      "label": "difficulty",
+      "description": "Overall solve difficulty or expected cognitive load."
+    },
+    {
+      "label": "acceptance_rate",
+      "description": "Popularity proxy from community solve rates."
+    },
+    {
+      "label": "frequency",
+      "description": "How often the concept appears in practice or interviews."
+    },
+    {
+      "label": "implementation_length",
+      "description": "How much code and bookkeeping the solution needs."
+    },
+    {
+      "label": "edge_case_density",
+      "description": "How many boundary conditions the problem contains."
+    },
+    {
+      "label": "prerequisite_load",
+      "description": "How much prior knowledge is needed before attempting."
+    },
+    {
+      "label": "novelty",
+      "description": "How fresh or unfamiliar the underlying idea feels."
+    },
+    {
+      "label": "repetition_risk",
+      "description": "How likely the problem is to feel repetitive relative to nearby items."
+    },
+    {
+      "label": "solution_uniqueness",
+      "description": "How many distinct valid solution approaches the problem supports."
+    },
+    {
+      "label": "branching_factor",
+      "description": "How many distinct decision branches the solution explores."
+    },
+    {
+      "label": "state_space_size",
+      "description": "How large the logical or DP state space becomes."
+    },
+    {
+      "label": "implementation_depth",
+      "description": "How much code or pointer state the solution needs."
+    },
+    {
+      "label": "runtime_criticality",
+      "description": "How sensitive the problem is to time complexity improvements."
+    },
+    {
+      "label": "data_structure_pressure",
+      "description": "How much the solution depends on maintaining a specialized structure."
+    }
+  ]
+}

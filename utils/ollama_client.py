@@ -7,8 +7,6 @@ import time
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
-import requests
-
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +30,13 @@ def generate(
     prefer_json: bool = True,
 ) -> OllamaResponse:
     import os
+    try:
+        import requests
+    except ImportError as exc:  # pragma: no cover - environment-specific dependency
+        raise RuntimeError(
+            "The 'requests' package is required for Ollama/Groq calls. "
+            "Use the bundled runtime or install requests in the active environment."
+        ) from exc
     grok_api = os.getenv("GROK_API")
     
     if grok_api:

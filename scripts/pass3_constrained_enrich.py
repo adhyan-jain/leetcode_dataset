@@ -1,14 +1,14 @@
 from __future__ import annotations
-from utils.logging_utils import log_execution, setup_global_logger
 
 import argparse
 import json
 import logging
+import re
 import sys
 from collections import Counter, defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Sequence
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT_DIR = SCRIPT_DIR.parent
@@ -17,54 +17,1467 @@ if str(ROOT_DIR) not in sys.path:
 
 from utils.io_utils import append_jsonl, ensure_parent_dir, extract_text_value, infer_problem_id, load_input_records, read_existing_ids, unwrap_raw_and_metadata
 from utils.ollama_client import generate
-from utils.text_utils import clamp01, clamp_int, normalize_label, normalize_whitespace
-from utils.validation import (
-    filter_to_allowed_weight_map,
-    sanitize_metadata_shape,
-    status_from_issues,
-    validate_pass3_metadata,
-)
+from utils.text_utils import best_match, clamp01, clamp_int, normalize_label, normalize_whitespace, snake_case
+
 
 logger = logging.getLogger("pass3_constrained_enrich")
 
-PROMPT_TEMPLATE = """You are normalizing DSA problem metadata using a fixed taxonomy.
+CATEGORY_KEYS = (
+    "domains",
+    "algorithms",
+    "patterns",
+    "micro_skills",
+    "failure_types",
+    "pattern_clusters",
+    "learning_targets",
+    "problem_roles",
+    "problem_traits",
+)
 
-You MUST use only the allowed labels in the main fields.
-If a necessary label is missing, put it in proposed_new_labels, but do not use it in the main metadata.
+CORE_MAIN_KEYS = ("domains", "algorithms", "patterns", "micro_skills")
+WEIGHT_MAP_KEYS = ("taxonomy", "skill_model", "problem_roles", "problem_traits")
 
-Allowed domains:
-{allowed_domains}
+MAX_CAPS = {
+    "domains": 5,
+    "algorithms": 15,
+    "patterns": 25,
+    "micro_skills": 50,
+    "failure_types": 30,
+    "pattern_clusters": 20,
+    "learning_targets": 30,
+    "problem_roles": 10,
+    "problem_traits": 20,
+    "topic_paths": 15,
+}
 
-Allowed algorithms:
-{allowed_algorithms}
+TRIVIAL_EASY_THRESHOLD = 0.40
 
-Allowed patterns:
-{allowed_patterns}
+BROAD_MICRO_SKILLS = {
+    "dynamic_programming",
+    "graph",
+    "tree",
+    "array",
+    "string",
+    "hash_table",
+    "math",
+    "binary_search",
+    "backtracking",
+    "greedy",
+    "simulation",
+    "design",
+    "sql",
+    "matrix",
+    "heap",
+    "trie",
+    "stack_queue",
+    "linked_list",
+}
 
-Allowed micro_skills:
-{allowed_micro_skills}
+WRONG_CATEGORY_ALIASES = {
+    "dynamic_programming": {"domains", "algorithms"},
+    "binary_search": {"domains", "algorithms"},
+    "shortest_path": {"algorithms", "patterns"},
+    "union_find": {"algorithms"},
+    "graph": {"domains"},
+    "tree": {"domains"},
+    "string": {"domains"},
+    "array": {"domains"},
+    "matrix": {"domains"},
+    "heap": {"domains"},
+    "trie": {"domains"},
+    "linked_list": {"domains"},
+    "stack_queue": {"domains"},
+}
 
-Allowed failure_types:
-{allowed_failure_types}
 
-Allowed pattern_clusters:
-{allowed_pattern_clusters}
+FAMILY_RULES = [
+    {
+        "name": "dynamic_programming",
+        "triggers": {
+            "dynamic_programming",
+            "dp",
+            "memoization",
+            "recurrence",
+            "fibonacci",
+            "climbing_stairs",
+            "edit_distance",
+            "knapsack",
+            "sequence_alignment",
+            "house_robber",
+            "palindrome_subsequence",
+            "subsequence",
+            "tabulation",
+        },
+        "seed": {
+            "domains": {"dynamic_programming": 1.0, "combinatorics": 0.6, "matrix": 0.2},
+            "algorithms": {
+                "dynamic_programming_top_down": 1.0,
+                "dynamic_programming_bottom_up": 1.0,
+                "memoization": 0.9,
+                "bitmask_dp": 0.5,
+                "digit_dp": 0.5,
+                "tree_dp": 0.4,
+            },
+            "patterns": {
+                "dp_linear_sequence": 1.0,
+                "dp_grid": 0.9,
+                "dp_interval": 0.8,
+                "word_break": 0.7,
+                "subset_sum": 0.7,
+                "combination_sum": 0.6,
+            },
+            "micro_skills": {
+                "dp_transition_design": 1.0,
+                "memoization_table_design": 0.9,
+                "tabulation_ordering": 0.9,
+                "base_case_selection": 0.8,
+                "state_encoding": 0.7,
+                "index_management": 0.7,
+            },
+            "failure_types": {
+                "missing_base_case": 1.0,
+                "incorrect_dp_transition": 1.0,
+                "incorrect_recursive_transition": 0.9,
+                "missing_memoization": 0.8,
+                "incorrect_state_transition": 0.8,
+            },
+            "pattern_clusters": {"dynamic_programming_core": 1.0},
+            "topic_paths": {"dsa_foundations > dynamic_programming_and_backtracking": 1.0},
+            "learning_targets": {"strengthen_dp_transitions": 1.0},
+        },
+    },
+    {
+        "name": "binary_search",
+        "triggers": {
+            "binary_search",
+            "rotated",
+            "sorted",
+            "answer_space",
+            "parametric",
+            "monotonic",
+            "search_a_2d_matrix",
+            "matrix_search",
+            "threshold",
+            "lower_bound",
+            "upper_bound",
+            "least",
+            "minimum",
+            "maximum",
+        },
+        "seed": {
+            "domains": {"binary_search": 1.0, "array": 0.8, "matrix": 0.4, "interval": 0.2},
+            "algorithms": {
+                "binary_search": 1.0,
+                "binary_search_on_answer": 1.0,
+                "ordered_map": 0.5,
+                "quickselect": 0.3,
+            },
+            "patterns": {
+                "binary_search_rotated_array": 1.0,
+                "merge_intervals": 0.2,
+                "meeting_rooms": 0.2,
+                "cyclic_sort": 0.2,
+                "buy_and_sell_stock": 0.2,
+                "jump_game": 0.2,
+            },
+            "micro_skills": {
+                "binary_search_bounds": 1.0,
+                "boundary_handling": 1.0,
+                "index_management": 0.9,
+                "ordering_constraints": 0.7,
+                "partitioning_logic": 0.5,
+                "matrix_coordinate_mapping": 0.6,
+            },
+            "failure_types": {
+                "incorrect_binary_search_bound": 1.0,
+                "off_by_one": 0.9,
+                "edge_case_omission": 0.8,
+                "wrong_partitioning": 0.5,
+            },
+            "pattern_clusters": {"searching_sorting_ranges": 1.0},
+            "topic_paths": {"dsa_foundations > searching_sorting_ranges": 1.0},
+            "learning_targets": {"practice_two_pointers": 0.4, "review_boundary_handling": 1.0},
+        },
+    },
+    {
+        "name": "graph_paths",
+        "triggers": {
+            "graph",
+            "path",
+            "shortest_path",
+            "dijkstra",
+            "bellman",
+            "floyd",
+            "warshall",
+            "mst",
+            "topological",
+            "course_schedule",
+            "network",
+            "connected",
+            "component",
+            "island",
+        },
+        "seed": {
+            "domains": {"graph": 1.0, "tree": 0.1, "heap": 0.4},
+            "algorithms": {
+                "depth_first_search": 0.8,
+                "breadth_first_search": 0.8,
+                "topological_sort": 0.8,
+                "union_find": 0.8,
+                "shortest_path": 1.0,
+                "dijkstra_shortest_path": 0.9,
+                "bellman_ford_shortest_path": 0.9,
+                "floyd_warshall_all_pairs_shortest_path": 0.9,
+                "minimum_spanning_tree": 0.7,
+                "prim_mst": 0.5,
+                "kruskal_mst": 0.5,
+            },
+            "patterns": {
+                "graph_connected_components": 1.0,
+                "shortest_path": 1.0,
+                "topological_ordering": 0.9,
+                "graph_union_find_components": 0.9,
+                "tree_level_order": 0.2,
+            },
+            "micro_skills": {
+                "graph_adjacency_traversal": 1.0,
+                "visited_marking": 0.9,
+                "graph_cycle_detection": 0.8,
+                "topological_indegree_tracking": 0.8,
+                "graph_weight_handling": 0.8,
+                "edge_relaxation": 0.8,
+                "distance_initialization": 0.7,
+            },
+            "failure_types": {
+                "graph_traversal_miss": 1.0,
+                "missed_visited_mark": 0.9,
+                "invalid_topological_order": 0.9,
+                "wrong_relaxation_update": 0.9,
+                "wrong_distance_initialization": 0.8,
+                "negative_cycle_missed": 0.8,
+                "wrong_mst_edge_choice": 0.6,
+            },
+            "pattern_clusters": {"graph_connectivity_and_paths": 1.0},
+            "topic_paths": {"dsa_foundations > graphs_and_search": 1.0},
+            "learning_targets": {"practice_graph_connectivity": 1.0},
+        },
+    },
+    {
+        "name": "tree",
+        "triggers": {"tree", "bst", "binary_tree", "ancestor", "lca", "traversal", "root"},
+        "seed": {
+            "domains": {"tree": 1.0, "binary_tree": 0.8, "binary_search_tree": 0.7, "heap": 0.2},
+            "algorithms": {
+                "tree_traversal": 1.0,
+                "depth_first_search": 0.8,
+                "breadth_first_search": 0.8,
+                "binary_tree_construction": 0.7,
+                "binary_lifting": 0.4,
+            },
+            "patterns": {
+                "tree_level_order": 1.0,
+                "tree_dfs": 1.0,
+                "bst_validation": 0.9,
+                "lowest_common_ancestor": 0.9,
+                "tree_construction": 0.9,
+                "trie_prefix_search": 0.3,
+            },
+            "micro_skills": {
+                "tree_node_access": 1.0,
+                "recursion_depth_control": 0.8,
+                "queue_usage": 0.8,
+                "base_case_selection": 0.8,
+                "subtree_aggregation": 0.6,
+            },
+            "failure_types": {
+                "wrong_parent_reconstruction": 0.9,
+                "incorrect_recursive_transition": 0.8,
+                "missing_base_case": 0.8,
+                "null_pointer_access": 0.8,
+            },
+            "pattern_clusters": {"tree_traversal_and_construction": 1.0},
+            "topic_paths": {"dsa_foundations > trees_and_heaps": 1.0},
+            "learning_targets": {"practice_tree_traversal": 1.0},
+        },
+    },
+    {
+        "name": "linked_list",
+        "triggers": {"linked", "reverse", "cycle", "list", "node", "pointer"},
+        "seed": {
+            "domains": {"linked_list": 1.0, "stack_queue": 0.4, "design": 0.1},
+            "algorithms": {"linked_list_manipulation": 1.0, "depth_first_search": 0.1, "simulation": 0.4},
+            "patterns": {
+                "linked_list_reversal": 1.0,
+                "linked_list_cycle": 0.9,
+                "fast_slow_pointer": 0.9,
+                "merge_k_sorted_lists": 0.5,
+                "reverse_k_group": 0.5,
+            },
+            "micro_skills": {
+                "linked_list_pointer_update": 1.0,
+                "pointer_update": 0.9,
+                "sentinel_dummy_node": 0.8,
+                "null_handling": 0.7,
+                "cycle_entry_detection": 0.8,
+            },
+            "failure_types": {
+                "pointer_mismanagement": 1.0,
+                "null_pointer_access": 0.9,
+                "infinite_loop": 0.8,
+                "wrong_k_way_merge_order": 0.6,
+            },
+            "pattern_clusters": {"linked_list_pointer_work": 1.0},
+            "topic_paths": {"dsa_foundations > linked_structures": 1.0},
+            "learning_targets": {"linked_list_basics": 1.0},
+        },
+    },
+    {
+        "name": "sliding_window",
+        "triggers": {"window", "substring", "subarray", "anagram", "minimum_window", "longest_substring", "sliding"},
+        "seed": {
+            "domains": {"string": 0.9, "array": 0.8, "hash_table": 0.4},
+            "algorithms": {"sliding_window_variable": 1.0, "prefix_sum": 0.4, "hash_map_lookup": 0.6},
+            "patterns": {
+                "sliding_window_variable": 1.0,
+                "longest_substring_without_repeating": 1.0,
+                "minimum_window_substring": 1.0,
+                "subarray_sum": 0.7,
+                "anagram_detection": 0.7,
+            },
+            "micro_skills": {
+                "window_shrink_expand": 1.0,
+                "string_indexing": 0.9,
+                "character_frequency_count": 0.8,
+                "state_tracking": 0.8,
+            },
+            "failure_types": {
+                "wrong_sliding_window_update": 1.0,
+                "off_by_one": 0.8,
+                "duplicate_handling_error": 0.7,
+                "edge_case_omission": 0.7,
+            },
+            "pattern_clusters": {"sliding_window_strings": 1.0},
+            "topic_paths": {"dsa_foundations > arrays_and_strings": 1.0},
+            "learning_targets": {"practice_sliding_window": 1.0},
+        },
+    },
+    {
+        "name": "prefix_sum",
+        "triggers": {"prefix", "range_sum", "subarray_sum", "difference", "running_sum"},
+        "seed": {
+            "domains": {"array": 1.0, "math": 0.2},
+            "algorithms": {"prefix_sum": 1.0, "hash_map_lookup": 0.5, "simulation": 0.3},
+            "patterns": {"subarray_sum": 1.0, "trapping_rain_water": 0.7, "dp_linear_sequence": 0.3},
+            "micro_skills": {"prefix_sum_construction": 1.0, "overflow_guarding": 0.7, "rolling_accumulator": 0.7},
+            "failure_types": {"wrong_prefix_sum_usage": 1.0, "integer_overflow": 0.7, "off_by_one": 0.6},
+            "pattern_clusters": {"pair_and_sum": 0.7},
+            "topic_paths": {"dsa_foundations > arrays_and_strings": 1.0},
+            "learning_targets": {"learn_prefix_sum": 1.0},
+        },
+    },
+    {
+        "name": "interval",
+        "triggers": {"interval", "meeting", "calendar", "merge", "overlap"},
+        "seed": {
+            "domains": {"interval": 1.0, "array": 0.3, "heap": 0.3},
+            "algorithms": {"interval_merge": 1.0, "sorting": 0.7, "heap_priority_queue": 0.4},
+            "patterns": {"merge_intervals": 1.0, "meeting_rooms": 1.0, "interval_scheduling": 0.6},
+            "micro_skills": {"interval_comparison": 1.0, "ordering_constraints": 0.8, "boundary_handling": 0.7},
+            "failure_types": {"ordering_error": 1.0, "off_by_one": 0.8, "wrong_greedy_choice": 0.6},
+            "pattern_clusters": {"interval_scheduling_and_merging": 1.0},
+            "topic_paths": {"dsa_foundations > intervals_and_ranges": 1.0},
+            "learning_targets": {"learn_interval_merging": 1.0},
+        },
+    },
+    {
+        "name": "backtracking",
+        "triggers": {"backtracking", "subset", "permutation", "combination", "queen", "sudoku", "search"},
+        "seed": {
+            "domains": {"combinatorics": 1.0, "matrix": 0.2, "graph": 0.1},
+            "algorithms": {"backtracking": 1.0, "divide_and_conquer": 0.3},
+            "patterns": {
+                "backtracking_combinations": 1.0,
+                "combination_sum": 1.0,
+                "subset_sum": 0.9,
+                "n_queen": 1.0,
+                "sudoku_validation": 0.8,
+            },
+            "micro_skills": {
+                "pruning": 1.0,
+                "state_reset": 0.9,
+                "base_case_selection": 0.8,
+                "recursion_depth_control": 0.8,
+            },
+            "failure_types": {
+                "failed_pruning": 1.0,
+                "incorrect_backtracking_restore": 0.9,
+                "missing_base_case": 0.8,
+                "edge_case_omission": 0.7,
+            },
+            "pattern_clusters": {"backtracking_and_combinatorics": 1.0},
+            "topic_paths": {"dsa_foundations > dynamic_programming_and_backtracking": 1.0},
+            "learning_targets": {"practice_backtracking_pruning": 1.0},
+        },
+    },
+    {
+        "name": "greedy",
+        "triggers": {"greedy", "jump_game", "stock", "profit", "schedule"},
+        "seed": {
+            "domains": {"greedy": 1.0, "array": 0.5, "interval": 0.4, "math": 0.1},
+            "algorithms": {"greedy_choice": 1.0, "sorting": 0.4, "heap_priority_queue": 0.2},
+            "patterns": {"buy_and_sell_stock": 1.0, "jump_game": 1.0, "meeting_rooms": 0.6},
+            "micro_skills": {"state_tracking": 0.9, "ordering_constraints": 0.8, "rolling_accumulator": 0.6},
+            "failure_types": {"wrong_greedy_choice": 1.0, "incorrect_state_transition": 0.7},
+            "pattern_clusters": {"design_and_state": 0.3},
+            "topic_paths": {"dsa_foundations > searching_sorting_ranges": 0.8},
+            "learning_targets": {"practice_graph_connectivity": 0.0},
+        },
+    },
+    {
+        "name": "string",
+        "triggers": {"string", "anagram", "palindrome", "regex", "match", "kmp", "trie"},
+        "seed": {
+            "domains": {"string": 1.0, "trie": 0.2, "hash_table": 0.2},
+            "algorithms": {"hash_map_lookup": 0.6, "trie_search": 0.8, "string_matching": 1.0},
+            "patterns": {"palindrome_check": 1.0, "string_matching": 1.0, "valid_parentheses": 0.6},
+            "micro_skills": {"string_indexing": 1.0, "substring_extraction": 0.9, "character_frequency_count": 0.8},
+            "failure_types": {"string_parsing_error": 1.0, "off_by_one": 0.7, "duplicate_handling_error": 0.7},
+            "pattern_clusters": {"string_and_stack_patterns": 1.0},
+            "topic_paths": {"dsa_foundations > arrays_and_strings": 1.0},
+            "learning_targets": {"string_basics": 1.0},
+        },
+    },
+    {
+        "name": "matrix",
+        "triggers": {"matrix", "grid", "spiral", "rotation", "coordinate"},
+        "seed": {
+            "domains": {"matrix": 1.0, "array": 0.3, "graph": 0.1},
+            "algorithms": {"matrix_traversal": 1.0, "simulation": 0.4, "depth_first_search": 0.2},
+            "patterns": {"matrix_spiral_traversal": 1.0, "matrix_rotation": 1.0, "sudoku_validation": 0.5},
+            "micro_skills": {"matrix_coordinate_mapping": 1.0, "direction_iteration": 0.8, "boundary_handling": 0.8},
+            "failure_types": {"incorrect_indexing": 0.9, "off_by_one": 0.8, "wrong_iteration_order": 0.7},
+            "pattern_clusters": {"array_rearrangement": 0.8},
+            "topic_paths": {"dsa_foundations > arrays_and_strings": 0.8},
+            "learning_targets": {"matrix_traversal_and_simulation": 1.0},
+        },
+    },
+    {
+        "name": "heap",
+        "triggers": {"heap", "priority_queue", "median", "top_k"},
+        "seed": {
+            "domains": {"heap": 1.0, "array": 0.2, "graph": 0.1},
+            "algorithms": {"heap_priority_queue": 1.0, "quickselect": 0.5, "ordered_map": 0.2},
+            "patterns": {"heap_top_k": 1.0, "design_median_finder": 0.9, "meeting_rooms": 0.7},
+            "micro_skills": {"heap_usage": 1.0, "state_tracking": 0.7, "ordering_constraints": 0.6},
+            "failure_types": {"heap_selection_error": 1.0, "wrong_k_way_merge_order": 0.7, "ordering_error": 0.6},
+            "pattern_clusters": {"array_rearrangement": 0.6},
+            "topic_paths": {"dsa_foundations > trees_and_heaps": 1.0},
+            "learning_targets": {"learn_heap_selection": 1.0},
+        },
+    },
+    {
+        "name": "design",
+        "triggers": {"design", "cache", "lru", "median_finder", "data structure"},
+        "seed": {
+            "domains": {"design": 1.0, "hash_table": 0.5, "linked_list": 0.3},
+            "algorithms": {"ordered_map": 0.7, "hash_map_lookup": 0.8, "heap_priority_queue": 0.3},
+            "patterns": {"design_lru_cache": 1.0, "design_median_finder": 1.0},
+            "micro_skills": {"state_tracking": 1.0, "hash_map_usage": 0.8, "pointer_update": 0.4},
+            "failure_types": {"state_reset_error": 0.8, "null_pointer_access": 0.5},
+            "pattern_clusters": {"design_and_state": 1.0},
+            "topic_paths": {"dsa_foundations > math_bit_sql_design": 1.0},
+            "learning_targets": {"design_data_structures": 1.0},
+        },
+    },
+    {
+        "name": "sql",
+        "triggers": {"sql", "query", "join", "group", "window", "rank"},
+        "seed": {
+            "domains": {"sql": 1.0},
+            "algorithms": {"ordered_map": 0.4},
+            "patterns": {"sql_group_by": 1.0, "sql_window_function": 1.0},
+            "micro_skills": {"sql_grouping_reasoning": 1.0, "sql_window_reasoning": 1.0},
+            "failure_types": {"sql_join_error": 0.9, "sql_grouping_error": 0.9, "ordering_error": 0.4},
+            "pattern_clusters": {"design_and_state": 0.1},
+            "topic_paths": {"dsa_foundations > math_bit_sql_design": 1.0},
+            "learning_targets": {"learn_sql_windows": 1.0},
+        },
+    },
+    {
+        "name": "bit",
+        "triggers": {"bit", "xor", "mask", "hamming", "binary"},
+        "seed": {
+            "domains": {"bit_manipulation": 1.0, "math": 0.4},
+            "algorithms": {"bit_manipulation": 1.0, "dynamic_programming_bottom_up": 0.2},
+            "patterns": {"bitmask_dp": 1.0, "n_queen": 0.2},
+            "micro_skills": {"bitmask_operations": 1.0, "bitset_usage": 0.9},
+            "failure_types": {"wrong_bitset_state": 1.0, "integer_overflow": 0.4},
+            "pattern_clusters": {"bitmask_and_dp": 1.0},
+            "topic_paths": {"dsa_foundations > math_bit_sql_design": 1.0},
+            "learning_targets": {"bit_manipulation_basics": 1.0},
+        },
+    },
+    {
+        "name": "segment_tree",
+        "triggers": {"segment_tree", "fenwick", "binary indexed tree", "range query"},
+        "seed": {
+            "domains": {"segment_tree": 1.0, "binary_indexed_tree": 1.0, "array": 0.2},
+            "algorithms": {"segment_tree_query_update": 1.0, "binary_indexed_tree_query_update": 1.0, "coordinate_compression": 0.7},
+            "patterns": {"segment_tree_range_query": 1.0, "fenwick_prefix_query": 1.0},
+            "micro_skills": {"lazy_propagation": 1.0, "range_update_logic": 0.9, "coordinate_compression": 0.8},
+            "failure_types": {"wrong_segment_tree_merge": 1.0, "incorrect_coordinate_compression": 0.9},
+            "pattern_clusters": {"range_query_structures": 1.0},
+            "topic_paths": {"dsa_foundations > searching_sorting_ranges": 0.8},
+            "learning_targets": {"practice_prefix_sum": 0.0},
+        },
+    },
+    {
+        "name": "randomized",
+        "triggers": {"random", "reservoir", "sampling", "probability"},
+        "seed": {
+            "domains": {"probability": 1.0, "randomized": 1.0, "math": 0.4},
+            "algorithms": {"reservoir_sampling": 1.0, "quickselect": 0.6, "meet_in_the_middle": 0.3},
+            "patterns": {"reservoir_sampling": 1.0, "meet_in_the_middle": 0.7, "heap_top_k": 0.3},
+            "micro_skills": {"probabilistic_reasoning": 1.0, "randomized_pivoting": 0.9, "reservoir_update": 0.8},
+            "failure_types": {"wrong_reservoir_update": 1.0, "wrong_randomized_partition": 0.9},
+            "pattern_clusters": {"randomized_and_sampling": 1.0},
+            "topic_paths": {"dsa_foundations > math_bit_sql_design": 0.7},
+            "learning_targets": {"probability_and_randomized": 1.0},
+        },
+    },
+]
+
+DIFFICULTY_BUCKETS = (
+    (0.2, "0.0-0.2"),
+    (0.4, "0.2-0.4"),
+    (0.6, "0.4-0.6"),
+    (0.8, "0.6-0.8"),
+    (1.1, "0.8-1.0"),
+)
+
+
+@dataclass
+class LoadedTaxonomy:
+    raw: Dict[str, Any]
+    items_by_category: Dict[str, List[Dict[str, Any]]]
+    item_by_label: Dict[str, Dict[str, Any]]
+    alias_to_label: Dict[str, str]
+    parent_to_children: Dict[str, List[str]]
+
+
+def setup_global_logger() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+
+
+def load_json(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def normalize_alias_list(value: Any) -> List[str]:
+    out: List[str] = []
+    if isinstance(value, list):
+        for item in value:
+            label = normalize_taxonomy_label(item)
+            if label:
+                out.append(label)
+    return dedupe(out)
+
+
+def dedupe(items: Iterable[str]) -> List[str]:
+    seen: set[str] = set()
+    out: List[str] = []
+    for item in items:
+        label = normalize_taxonomy_label(item)
+        if label and label not in seen:
+            seen.add(label)
+            out.append(label)
+    return out
+
+
+def merge_unique(*lists: Iterable[str]) -> List[str]:
+    out: List[str] = []
+    for lst in lists:
+        out.extend(lst)
+    return dedupe(out)
+
+
+def normalize_taxonomy_label(value: Any) -> str:
+    return normalize_whitespace(snake_case(value))
+
+
+def canonicalize_label(label: str, active_taxonomy: LoadedTaxonomy, label_mapping: Mapping[str, str]) -> str:
+    normalized = normalize_taxonomy_label(label)
+    if not normalized:
+        return ""
+    mapped = label_mapping.get(normalized, normalized)
+    return active_taxonomy.alias_to_label.get(mapped, mapped)
+
+
+def canonicalize_label_for_category(label: str, category: str, active_taxonomy: LoadedTaxonomy, label_mapping: Mapping[str, str]) -> str:
+    normalized = normalize_taxonomy_label(label)
+    if not normalized:
+        return ""
+    allowed = {item["label"] for item in active_taxonomy.items_by_category.get(category, [])}
+    mapped = label_mapping.get(normalized, normalized)
+    if mapped in allowed:
+        return mapped
+    alias = active_taxonomy.alias_to_label.get(mapped, mapped)
+    if alias in allowed:
+        return alias
+    return ""
+
+
+def load_taxonomy_file(path: Path) -> LoadedTaxonomy:
+    data = load_json(path)
+    if not isinstance(data, dict):
+        raise ValueError(f"taxonomy file must be a JSON object: {path}")
+
+    items_by_category: Dict[str, List[Dict[str, Any]]] = {key: [] for key in CATEGORY_KEYS}
+    item_by_label: Dict[str, Dict[str, Any]] = {}
+    alias_to_label: Dict[str, str] = {}
+    parent_to_children: Dict[str, List[str]] = defaultdict(list)
+
+    for category in CATEGORY_KEYS:
+        raw_items = data.get(category, [])
+        if not isinstance(raw_items, list):
+            continue
+        for raw_item in raw_items:
+            if isinstance(raw_item, str):
+                item = {"label": normalize_taxonomy_label(raw_item), "description": "", "aliases": [], "parent": None}
+            elif isinstance(raw_item, dict):
+                item = {
+                    "label": normalize_taxonomy_label(raw_item.get("label") or raw_item.get("name")),
+                    "description": normalize_whitespace(str(raw_item.get("description", "") or "")),
+                    "aliases": normalize_alias_list(raw_item.get("aliases", [])),
+                    "parent": normalize_taxonomy_label(raw_item.get("parent")) or None,
+                }
+            else:
+                continue
+            if not item["label"]:
+                continue
+            item["category"] = category
+            items_by_category[category].append(item)
+            item_by_label[item["label"]] = item
+            alias_to_label[item["label"]] = item["label"]
+            for alias in item["aliases"]:
+                alias_to_label[alias] = item["label"]
+            if item.get("parent"):
+                parent_to_children[item["parent"]].append(item["label"])
+
+    return LoadedTaxonomy(raw=data, items_by_category=items_by_category, item_by_label=item_by_label, alias_to_label=alias_to_label, parent_to_children=parent_to_children)
+
+
+def load_flat_mapping(path: Path) -> Dict[str, str]:
+    data = load_json(path)
+    if not isinstance(data, dict):
+        return {}
+    out: Dict[str, str] = {}
+    if all(isinstance(v, str) for v in data.values()):
+        for k, v in data.items():
+            nk, nv = normalize_taxonomy_label(k), normalize_taxonomy_label(v)
+            if nk and nv:
+                out[nk] = nv
+        return out
+    for value in data.values():
+        if not isinstance(value, dict):
+            continue
+        for k, v in value.items():
+            nk, nv = normalize_taxonomy_label(k), normalize_taxonomy_label(v)
+            if nk and nv:
+                out[nk] = nv
+    return out
+
+
+def load_topic_hierarchy(path: Path) -> List[Dict[str, Any]]:
+    data = load_json(path)
+    if not isinstance(data, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        out.append(
+            {
+                "topic": normalize_taxonomy_label(item.get("topic")),
+                "description": normalize_whitespace(str(item.get("description", "") or "")),
+                "parent": normalize_taxonomy_label(item.get("parent")) or None,
+                "children": dedupe(item.get("children", []) if isinstance(item.get("children"), list) else []),
+                "contains_domains": dedupe(item.get("contains_domains", []) if isinstance(item.get("contains_domains"), list) else []),
+                "contains_algorithms": dedupe(item.get("contains_algorithms", []) if isinstance(item.get("contains_algorithms"), list) else []),
+                "contains_patterns": dedupe(item.get("contains_patterns", []) if isinstance(item.get("contains_patterns"), list) else []),
+                "contains_micro_skills": dedupe(item.get("contains_micro_skills", []) if isinstance(item.get("contains_micro_skills"), list) else []),
+            }
+        )
+    return out
+
+
+def load_allowed_subset(path: Path) -> Dict[str, List[Dict[str, Any]]]:
+    tax = load_taxonomy_file(path)
+    return tax.items_by_category
+
+
+def build_problem_fields(raw: Dict[str, Any]) -> Dict[str, str]:
+    return {
+        "id": str(raw.get("id") or raw.get("problem_id") or raw.get("question_id") or raw.get("slug") or ""),
+        "title": extract_text_value(raw, ("title", "name", "question_title", "problem_title")),
+        "difficulty": extract_text_value(raw, ("difficulty", "level", "difficulty_level")),
+        "tags": extract_text_value(raw, ("tags", "tag", "topic_tags", "category")),
+        "description": extract_text_value(raw, ("description", "statement", "problem", "content", "question", "body")),
+        "similar_questions": extract_text_value(raw, ("similar_questions", "similar", "related_questions")),
+        "companies": extract_text_value(raw, ("companies", "company", "company_tags")),
+        "acceptance_rate": extract_text_value(raw, ("acceptance_rate", "acceptance", "acceptanceRate")),
+    }
+
+
+def extract_tokens(text: str) -> List[str]:
+    if not text:
+        return []
+    raw_parts = re.split(r"[^a-zA-Z0-9]+", normalize_whitespace(text))
+    tokens: List[str] = []
+    for part in raw_parts:
+        normalized = normalize_label(part)
+        if normalized:
+            tokens.append(normalized)
+    return tokens
+
+
+def raw_to_list(value: Any) -> List[str]:
+    if isinstance(value, list):
+        out: List[str] = []
+        for item in value:
+            if isinstance(item, dict):
+                out.extend(extract_tokens(json.dumps(item, ensure_ascii=False)))
+            else:
+                out.extend(extract_tokens(str(item)))
+        return dedupe(out)
+    if isinstance(value, dict):
+        return extract_tokens(json.dumps(value, ensure_ascii=False))
+    return extract_tokens(str(value or ""))
+
+
+def build_routing_signals(raw: Dict[str, Any], pass1_metadata: Dict[str, Any]) -> Dict[str, Any]:
+    fields = build_problem_fields(raw)
+    metadata_taxonomy = pass1_metadata.get("taxonomy") if isinstance(pass1_metadata.get("taxonomy"), dict) else {}
+    skill_model = pass1_metadata.get("skill_model") if isinstance(pass1_metadata.get("skill_model"), dict) else {}
+    failure_model = pass1_metadata.get("failure_model") if isinstance(pass1_metadata.get("failure_model"), dict) else {}
+
+    keywords = merge_unique(
+        extract_tokens(fields["title"]),
+        extract_tokens(fields["description"]),
+        extract_tokens(fields["tags"]),
+        extract_tokens(fields["similar_questions"]),
+        extract_tokens(fields["companies"]),
+        extract_tokens(fields["acceptance_rate"]),
+        extract_tokens(str(pass1_metadata.get("pattern_cluster", ""))),
+        extract_tokens(str(pass1_metadata.get("solution_dna_summary", ""))),
+    )
+
+    raw_topics = raw_to_list(raw.get("related_topics"))
+    similar_topics = raw_to_list(raw.get("similar_questions"))
+    keywords = merge_unique(keywords, raw_topics, similar_topics)
+
+    pass1_domains = dedupe(metadata_taxonomy.get("domains", {}).keys() if isinstance(metadata_taxonomy.get("domains"), dict) else [])
+    pass1_algorithms = dedupe(metadata_taxonomy.get("algorithms", {}).keys() if isinstance(metadata_taxonomy.get("algorithms"), dict) else [])
+    pass1_patterns = dedupe(metadata_taxonomy.get("patterns", {}).keys() if isinstance(metadata_taxonomy.get("patterns"), dict) else [])
+    pass1_micro_skills = dedupe(metadata_taxonomy.get("micro_skills", {}).keys() if isinstance(metadata_taxonomy.get("micro_skills"), dict) else [])
+    pass1_failures = []
+    common_failures = failure_model.get("common_failures", {})
+    if isinstance(common_failures, dict):
+        pass1_failures = dedupe(common_failures.keys())
+    pass1_pattern_cluster = normalize_taxonomy_label(pass1_metadata.get("pattern_cluster", ""))
+    difficulty_label = normalize_label(fields["difficulty"])
+    if difficulty_label not in {"easy", "medium", "hard"}:
+        difficulty_label = normalize_label(raw.get("difficulty", "")) or difficulty_label
+
+    return {
+        "keywords": keywords,
+        "raw_topics": raw_topics,
+        "pass1_domains": pass1_domains,
+        "pass1_algorithms": pass1_algorithms,
+        "pass1_patterns": pass1_patterns,
+        "pass1_micro_skills": pass1_micro_skills,
+        "pass1_failures": pass1_failures,
+        "pass1_pattern_cluster": pass1_pattern_cluster,
+        "difficulty_label": difficulty_label,
+    }
+
+
+def route_families(signals: Dict[str, Any]) -> List[str]:
+    haystack = set(signals["keywords"]) | set(signals["raw_topics"]) | set(signals["pass1_domains"]) | set(signals["pass1_algorithms"]) | set(signals["pass1_patterns"]) | set(signals["pass1_micro_skills"]) | set(signals["pass1_failures"]) | {signals["pass1_pattern_cluster"]}
+    matched: List[str] = []
+    for family in FAMILY_RULES:
+        if family["triggers"] & haystack:
+            matched.append(family["name"])
+    if not matched and ("dynamic_programming" in haystack or "memoization" in haystack):
+        matched.append("dynamic_programming")
+    if not matched and ("binary_search" in haystack or "search" in haystack):
+        matched.append("binary_search")
+    if not matched and ("graph" in haystack or "shortest_path" in haystack):
+        matched.append("graph_paths")
+    return dedupe(matched)
+
+
+def score_label(item: Dict[str, Any], signals: Dict[str, Any], family_seeds: Mapping[str, float], category: str, label_to_item: Mapping[str, Dict[str, Any]], mapping: Mapping[str, str]) -> float:
+    label = item["label"]
+    aliases = set(item.get("aliases", []))
+    desc_tokens = set(extract_tokens(item.get("description", "")))
+    haystack = set(signals["keywords"]) | set(signals["raw_topics"]) | set(signals["pass1_domains"]) | set(signals["pass1_algorithms"]) | set(signals["pass1_patterns"]) | set(signals["pass1_micro_skills"]) | set(signals["pass1_failures"]) | {signals["pass1_pattern_cluster"]}
+    score = 0.0
+
+    if label in haystack:
+        score += 5.0
+    if aliases & haystack:
+        score += 4.0
+    if desc_tokens & haystack:
+        score += 1.5
+    if label in signals["keywords"]:
+        score += 3.0
+    if any(alias in signals["keywords"] for alias in aliases):
+        score += 2.5
+    if label in signals.get(f"pass1_{category}", []):
+        score += 6.0
+    mapped_pass1 = mapping.get(label)
+    if mapped_pass1 and mapped_pass1 in signals.get(f"pass1_{category}", []):
+        score += 5.0
+
+    for family_name, family_score in family_seeds.items():
+        family = next((f for f in FAMILY_RULES if f["name"] == family_name), None)
+        if not family:
+            continue
+        seed = family["seed"].get(category, {})
+        if label in seed:
+            score += 4.0 * family_score * float(seed[label])
+        parent = item.get("parent")
+        if parent and parent in seed:
+            score += 1.0 * family_score * float(seed[parent])
+
+    if item.get("parent") and item["parent"] in label_to_item:
+        score += 0.3
+    return score
+
+
+def family_score_map(families: Sequence[str]) -> Dict[str, float]:
+    return {family: 1.0 - (idx * 0.1) for idx, family in enumerate(families)}
+
+
+def build_topic_paths(selected: Dict[str, List[str]], topic_hierarchy: List[Dict[str, Any]]) -> List[str]:
+    selected_set = set(selected.get("domains", [])) | set(selected.get("algorithms", [])) | set(selected.get("patterns", [])) | set(selected.get("micro_skills", []))
+    scored: List[tuple[float, str]] = []
+    for node in topic_hierarchy:
+        score = 0.0
+        score += sum(1.0 for x in node.get("contains_domains", []) if x in selected_set)
+        score += sum(0.8 for x in node.get("contains_algorithms", []) if x in selected_set)
+        score += sum(0.8 for x in node.get("contains_patterns", []) if x in selected_set)
+        score += sum(0.4 for x in node.get("contains_micro_skills", []) if x in selected_set)
+        if node.get("topic"):
+            if node["topic"] in selected_set:
+                score += 0.8
+            path = node["topic"] if not node.get("parent") else f"{node['parent']} > {node['topic']}"
+            scored.append((score, path))
+    scored.sort(key=lambda x: (-x[0], x[1]))
+    return dedupe([path for score, path in scored if score > 0][:MAX_CAPS["topic_paths"]])
+
+
+def expand_category_with_parents(labels: List[str], taxonomy: LoadedTaxonomy, category: str) -> List[str]:
+    out = list(labels)
+    for label in labels:
+        item = taxonomy.item_by_label.get(label)
+        if not item:
+            continue
+        parent = item.get("parent")
+        if parent and parent in taxonomy.item_by_label:
+            out.append(parent)
+            for child in taxonomy.parent_to_children.get(parent, []):
+                if child != label:
+                    out.append(child)
+    return dedupe(out)
+
+
+def select_taxonomy_subset(routing_signals: Dict[str, Any], active_taxonomy: LoadedTaxonomy, topic_hierarchy: List[Dict[str, Any]], label_mapping: Mapping[str, str]) -> Dict[str, List[str]]:
+    families = route_families(routing_signals)
+    family_scores = family_score_map(families)
+    selected: Dict[str, List[str]] = {key: [] for key in CATEGORY_KEYS}
+
+    # Pre-seed from pass1 labels and family rules.
+    for family_name in families:
+        family = next((f for f in FAMILY_RULES if f["name"] == family_name), None)
+        if not family:
+            continue
+        for category in ("domains", "algorithms", "patterns", "micro_skills", "failure_types", "pattern_clusters", "learning_targets"):
+            selected[category].extend(list(family["seed"].get(category, {}).keys()))
+
+    # Pull in pass1 labels explicitly.
+    selected["domains"].extend(routing_signals["pass1_domains"])
+    selected["algorithms"].extend(routing_signals["pass1_algorithms"])
+    selected["patterns"].extend(routing_signals["pass1_patterns"])
+    selected["micro_skills"].extend(routing_signals["pass1_micro_skills"])
+    selected["failure_types"].extend(routing_signals["pass1_failures"])
+    if routing_signals["pass1_pattern_cluster"]:
+        selected["pattern_clusters"].append(routing_signals["pass1_pattern_cluster"])
+
+    # Generic scoring per category.
+    for category in ("domains", "algorithms", "patterns", "micro_skills", "failure_types", "pattern_clusters", "learning_targets", "problem_roles", "problem_traits"):
+        if category not in active_taxonomy.items_by_category:
+            continue
+        scored: List[tuple[float, str]] = []
+        for item in active_taxonomy.items_by_category[category]:
+            score = score_label(item, routing_signals, family_scores, category, active_taxonomy.item_by_label, label_mapping)
+            if category == "micro_skills" and item["label"] in BROAD_MICRO_SKILLS:
+                score -= 0.4
+            if category == "patterns" and item["label"] in selected["micro_skills"]:
+                score += 0.7
+            if category == "micro_skills" and item["label"] in selected["patterns"]:
+                score += 0.5
+            scored.append((score, item["label"]))
+        scored.sort(key=lambda x: (-x[0], x[1]))
+        top = [label for score, label in scored if score > 0][: MAX_CAPS.get(category, 20)]
+        selected[category] = merge_unique(selected.get(category, []), top)
+
+    # Additional family-specific must-have labels.
+    if "dynamic_programming" in families:
+        selected["patterns"].extend(["dp_linear_sequence", "dp_grid", "dp_interval", "word_break", "subset_sum"])
+        selected["micro_skills"].extend(["dp_transition_design", "memoization_table_design", "tabulation_ordering", "base_case_selection"])
+        selected["failure_types"].extend(["missing_base_case", "incorrect_dp_transition", "missing_memoization"])
+    if "binary_search" in families:
+        selected["patterns"].extend(["binary_search_rotated_array", "merge_intervals", "meeting_rooms"])
+        selected["micro_skills"].extend(["binary_search_bounds", "boundary_handling", "index_management"])
+        selected["failure_types"].extend(["incorrect_binary_search_bound", "off_by_one", "edge_case_omission"])
+    if "graph_paths" in families:
+        selected["algorithms"].extend(["dijkstra_shortest_path", "bellman_ford_shortest_path", "floyd_warshall_all_pairs_shortest_path", "minimum_spanning_tree"])
+        selected["patterns"].extend(["shortest_path", "graph_connected_components", "topological_ordering", "graph_union_find_components"])
+        selected["micro_skills"].extend(["graph_adjacency_traversal", "visited_marking", "graph_weight_handling", "edge_relaxation"])
+        selected["failure_types"].extend(["wrong_relaxation_update", "wrong_distance_initialization", "graph_traversal_miss"])
+    if "tree" in families:
+        selected["patterns"].extend(["tree_level_order", "tree_dfs", "bst_validation", "tree_construction", "lowest_common_ancestor"])
+        selected["micro_skills"].extend(["tree_node_access", "recursion_depth_control", "queue_usage", "base_case_selection"])
+        selected["failure_types"].extend(["wrong_parent_reconstruction", "null_pointer_access", "missing_base_case"])
+    if "linked_list" in families:
+        selected["patterns"].extend(["linked_list_reversal", "linked_list_cycle", "fast_slow_pointer", "reverse_k_group"])
+        selected["micro_skills"].extend(["linked_list_pointer_update", "pointer_update", "sentinel_dummy_node"])
+        selected["failure_types"].extend(["pointer_mismanagement", "infinite_loop", "null_pointer_access"])
+
+    # Canonicalize all routed labels before prompt construction.
+    for category in ("domains", "algorithms", "patterns", "micro_skills", "failure_types", "pattern_clusters", "learning_targets", "problem_roles", "problem_traits"):
+        selected[category] = dedupe(
+            canonicalize_label_for_category(label, category, active_taxonomy, label_mapping)
+            for label in selected.get(category, [])
+            if canonicalize_label_for_category(label, category, active_taxonomy, label_mapping)
+        )
+
+    # Topic paths from hierarchy.
+    selected["topic_paths"] = build_topic_paths(selected, topic_hierarchy)
+
+    # Learning targets / roles / traits.
+    selected["learning_targets"] = build_learning_targets(selected, routing_signals, active_taxonomy)
+    selected["problem_roles"] = build_problem_roles(routing_signals, selected)
+    selected["problem_traits"] = build_problem_traits(routing_signals, selected)
+
+    # Final cap enforcement.
+    for category in ("domains", "algorithms", "patterns", "micro_skills", "failure_types", "pattern_clusters", "learning_targets", "problem_roles", "problem_traits"):
+        selected[category] = dedupe(selected.get(category, []))[: MAX_CAPS.get(category, 20)]
+    selected["topic_paths"] = dedupe(selected.get("topic_paths", []))[: MAX_CAPS["topic_paths"]]
+    return selected
+
+
+def build_learning_targets(selected: Dict[str, List[str]], routing_signals: Dict[str, Any], active_taxonomy: LoadedTaxonomy) -> List[str]:
+    patterns = set(selected.get("patterns", []))
+    algorithms = set(selected.get("algorithms", []))
+    micro = set(selected.get("micro_skills", []))
+    out: List[str] = []
+    if "dp_linear_sequence" in patterns or "dynamic_programming_bottom_up" in algorithms:
+        out.extend(["learn_prefix_sum", "strengthen_dp_transitions", "recover_from_state_errors"])
+    if "binary_search" in algorithms or "binary_search_on_answer" in algorithms:
+        out.extend(["review_boundary_handling", "practice_two_pointers"])
+    if "graph_connected_components" in patterns or "shortest_path" in patterns:
+        out.extend(["practice_graph_connectivity", "learn_heap_selection"])
+    if "merge_intervals" in patterns or "meeting_rooms" in patterns:
+        out.extend(["learn_interval_merging", "review_boundary_handling"])
+    if "tree_level_order" in patterns or "tree_dfs" in patterns:
+        out.extend(["practice_tree_traversal", "strengthen_dp_transitions"])
+    if "linked_list_reversal" in patterns:
+        out.extend(["linked_list_basics", "recover_from_state_errors"])
+    if "sliding_window_variable" in patterns or "minimum_window_substring" in patterns:
+        out.extend(["practice_sliding_window", "review_boundary_handling"])
+    if "bitmask_dp" in algorithms or "bit_manipulation" in algorithms:
+        out.extend(["bit_manipulation_basics", "practice_backtracking_pruning"])
+    if "sql_window_function" in patterns or "sql_group_by" in patterns:
+        out.extend(["learn_sql_windows", "review_boundary_handling"])
+    if not out:
+        out.extend(["first_exposure", "guided_practice"])
+    return dedupe(out)
+
+
+def build_problem_roles(routing_signals: Dict[str, Any], selected: Dict[str, List[str]]) -> Dict[str, float]:
+    difficulty = routing_signals.get("difficulty_label", "")
+    overall = estimate_overall_difficulty(difficulty, selected)
+    roles = {
+        "first_exposure": 0.0,
+        "guided_practice": 0.0,
+        "reinforcement": 0.0,
+        "review": 0.0,
+        "recovery": 0.0,
+        "challenge": 0.0,
+        "assessment": 0.0,
+    }
+    if difficulty == "easy":
+        roles.update({"first_exposure": 0.85, "guided_practice": 0.95, "reinforcement": 0.7, "review": 0.55, "assessment": 0.2, "recovery": 0.25, "challenge": 0.1})
+    elif difficulty == "medium":
+        roles.update({"first_exposure": 0.3, "guided_practice": 0.8, "reinforcement": 0.85, "review": 0.65, "assessment": 0.55, "recovery": 0.45, "challenge": 0.45})
+    else:
+        roles.update({"first_exposure": 0.1, "guided_practice": 0.35, "reinforcement": 0.65, "review": 0.75, "assessment": 0.8, "recovery": 0.85, "challenge": 0.95})
+    if overall > 0.75:
+        roles["challenge"] = max(roles["challenge"], 0.9)
+    if overall < 0.35:
+        roles["first_exposure"] = max(roles["first_exposure"], 0.8)
+    return {k: clamp01(v) for k, v in roles.items()}
+
+
+def build_problem_traits(routing_signals: Dict[str, Any], selected: Dict[str, List[str]]) -> Dict[str, float]:
+    difficulty = routing_signals.get("difficulty_label", "")
+    overall = estimate_overall_difficulty(difficulty, selected)
+    traits = {
+        "difficulty": overall,
+        "acceptance_rate": 0.65,
+        "frequency": 0.7,
+        "implementation_length": 0.55,
+        "edge_case_density": 0.5,
+        "prerequisite_load": 0.4,
+        "novelty": 0.45,
+        "repetition_risk": 0.35,
+        "solution_uniqueness": 0.5,
+    }
+    if "shortest_path" in selected.get("patterns", []):
+        traits["implementation_length"] = 0.7
+        traits["prerequisite_load"] = 0.6
+    if "dp_linear_sequence" in selected.get("patterns", []):
+        traits["prerequisite_load"] = max(traits["prerequisite_load"], 0.65)
+        traits["edge_case_density"] = max(traits["edge_case_density"], 0.6)
+    if "merge_intervals" in selected.get("patterns", []):
+        traits["edge_case_density"] = max(traits["edge_case_density"], 0.7)
+    if "design_lru_cache" in selected.get("patterns", []):
+        traits["implementation_length"] = 0.75
+        traits["solution_uniqueness"] = 0.65
+    return {k: clamp01(v) for k, v in traits.items()}
+
+
+def estimate_overall_difficulty(difficulty_label: str, selected: Dict[str, List[str]]) -> float:
+    if difficulty_label == "easy":
+        base = 0.25
+    elif difficulty_label == "medium":
+        base = 0.55
+    elif difficulty_label == "hard":
+        base = 0.82
+    else:
+        base = 0.5
+    base += 0.04 * max(0, len(selected.get("patterns", [])) - 1)
+    base += 0.02 * max(0, len(selected.get("micro_skills", [])) - 5)
+    return clamp01(base)
+
+
+def format_allowed_items(items: Sequence[Dict[str, Any]]) -> str:
+    rendered: List[Dict[str, Any]] = []
+    for item in items:
+        if isinstance(item, dict):
+            rendered.append(
+                {
+                    "label": item.get("label", ""),
+                    "description": item.get("description", ""),
+                    "aliases": item.get("aliases", []),
+                    "parent": item.get("parent"),
+                }
+            )
+        else:
+            rendered.append({"label": str(item), "description": "", "aliases": [], "parent": None})
+    return json.dumps(rendered, ensure_ascii=False, indent=2)
+
+
+def format_allowed_paths(paths: Sequence[str]) -> str:
+    return json.dumps(list(paths), ensure_ascii=False, indent=2)
+
+
+def extract_json(text: str) -> Dict[str, Any]:
+    text = normalize_whitespace(text)
+    if not text:
+        raise ValueError("empty response")
+    try:
+        return json.loads(text)
+    except Exception:
+        start = text.find("{")
+        end = text.rfind("}")
+        if start >= 0 and end > start:
+            return json.loads(text[start : end + 1])
+        raise
+
+
+def normalize_weight_map(value: Any) -> Dict[str, float]:
+    out: Dict[str, float] = {}
+    if isinstance(value, dict):
+        for label, raw_weight in value.items():
+            normalized = normalize_taxonomy_label(label)
+            if not normalized:
+                continue
+            weight = clamp01(raw_weight)
+            if weight > 0:
+                out[normalized] = max(out.get(normalized, 0.0), weight)
+    elif isinstance(value, list):
+        for item in value:
+            if isinstance(item, str):
+                label = normalize_taxonomy_label(item)
+                if label:
+                    out[label] = 1.0
+            elif isinstance(item, dict):
+                label = normalize_taxonomy_label(item.get("label") or item.get("name"))
+                if label:
+                    out[label] = max(out.get(label, 0.0), clamp01(item.get("weight", 1.0)))
+    return out
+
+
+def normalize_label_list(value: Any) -> List[str]:
+    if isinstance(value, list):
+        return dedupe([normalize_taxonomy_label(x) for x in value if normalize_taxonomy_label(x)])
+    if isinstance(value, str):
+        return dedupe([normalize_taxonomy_label(value)])
+    return []
+
+
+def normalize_failure_model(value: Any) -> Dict[str, Dict[str, Any]]:
+    out: Dict[str, Dict[str, Any]] = {}
+    if not isinstance(value, dict):
+        return out
+    for label, payload in value.items():
+        key = normalize_taxonomy_label(label)
+        if not key:
+            continue
+        affected = []
+        severity = 0.0
+        if isinstance(payload, dict):
+            affected = normalize_label_list(payload.get("affected_skills", []))
+            severity = clamp01(payload.get("severity", 0.0))
+        out[key] = {"affected_skills": affected, "severity": severity}
+    return out
+
+
+def normalize_problem_roles(value: Any) -> Dict[str, float]:
+    return normalize_weight_map(value)
+
+
+def normalize_problem_traits(value: Any) -> Dict[str, float]:
+    return normalize_weight_map(value)
+
+
+def sanitize_final_metadata(candidate: Any, selected: Dict[str, List[str]], active_taxonomy: LoadedTaxonomy, label_mapping: Mapping[str, str], routing_signals: Dict[str, Any]) -> tuple[Dict[str, Any], List[str], Dict[str, List[str]]]:
+    issues: List[str] = []
+    proposed: Dict[str, List[str]] = {key: [] for key in CATEGORY_KEYS}
+
+    if not isinstance(candidate, dict):
+        return {}, ["invalid_json"], proposed
+
+    expected = {
+        "taxonomy": {},
+        "topic_path": [],
+        "difficulty_vector": {},
+        "skill_model": {},
+        "failure_model": {},
+        "learning_targets": [],
+        "problem_roles": {},
+        "problem_traits": {},
+        "pattern_cluster": "",
+        "estimated_time_minutes": 0,
+        "solution_dna_summary": "",
+        "metadata_confidence": 0.0,
+        "proposed_new_labels": {key: [] for key in CATEGORY_KEYS},
+        "validation": {"needs_human_review": False, "review_reasons": []},
+    }
+    merged = dict(expected)
+    merged.update(candidate)
+
+    taxonomy = merged.get("taxonomy") if isinstance(merged.get("taxonomy"), dict) else {}
+    skill_model = merged.get("skill_model") if isinstance(merged.get("skill_model"), dict) else {}
+    failure_model = merged.get("failure_model") if isinstance(merged.get("failure_model"), dict) else {}
+    difficulty_vector = merged.get("difficulty_vector") if isinstance(merged.get("difficulty_vector"), dict) else {}
+    validation = merged.get("validation") if isinstance(merged.get("validation"), dict) else {}
+
+    cleaned = {
+        "taxonomy": {key: {} for key in CORE_MAIN_KEYS},
+        "topic_path": [],
+        "difficulty_vector": {
+            "overall": clamp01(difficulty_vector.get("overall", 0.0)),
+            "conceptual": clamp01(difficulty_vector.get("conceptual", 0.0)),
+            "implementation": clamp01(difficulty_vector.get("implementation", 0.0)),
+            "edge_cases": clamp01(difficulty_vector.get("edge_cases", 0.0)),
+            "debugging": clamp01(difficulty_vector.get("debugging", 0.0)),
+        },
+        "skill_model": {"requires": {}, "trains": {}, "tests": {}},
+        "failure_model": {"common_failures": {}},
+        "learning_targets": [],
+        "problem_roles": {},
+        "problem_traits": {},
+        "pattern_cluster": normalize_taxonomy_label(merged.get("pattern_cluster", "")),
+        "estimated_time_minutes": clamp_int(merged.get("estimated_time_minutes", 0), default=0, minimum=0, maximum=240),
+        "solution_dna_summary": normalize_whitespace(str(merged.get("solution_dna_summary", "") or "")),
+        "metadata_confidence": clamp01(merged.get("metadata_confidence", 0.0)),
+        "proposed_new_labels": {key: [] for key in CATEGORY_KEYS},
+        "validation": {
+            "needs_human_review": bool(validation.get("needs_human_review", False)),
+            "review_reasons": normalize_label_list(validation.get("review_reasons", [])),
+        },
+    }
+
+    # Taxonomy maps.
+    for category in CORE_MAIN_KEYS:
+        raw_map = normalize_weight_map(taxonomy.get(category, {}))
+        allowed = set(selected.get(category, []))
+        remapped: Dict[str, float] = {}
+        for label, weight in raw_map.items():
+            mapped = label_mapping.get(label, label)
+            if mapped in allowed:
+                remapped[mapped] = max(remapped.get(mapped, 0.0), clamp01(weight))
+            else:
+                fallback = active_taxonomy.alias_to_label.get(mapped, mapped)
+                if fallback in allowed:
+                    remapped[fallback] = max(remapped.get(fallback, 0.0), clamp01(weight))
+                else:
+                    proposed[category].append(mapped)
+                    issues.append(f"unknown_{category[:-1]}:{mapped}")
+        cleaned["taxonomy"][category] = remapped
+
+    # Topic path.
+    topic_path = merged.get("topic_path", [])
+    if isinstance(topic_path, str):
+        topic_path = [topic_path]
+    if not isinstance(topic_path, list):
+        topic_path = []
+    allowed_paths = set(selected.get("topic_paths", []))
+    cleaned["topic_path"] = dedupe([normalize_whitespace(str(x)) for x in topic_path if normalize_whitespace(str(x)) and normalize_whitespace(str(x)) in allowed_paths])
+    for path in topic_path:
+        npath = normalize_whitespace(str(path))
+        if npath and npath not in allowed_paths:
+            issues.append(f"unknown_topic_path:{npath}")
+
+    # Skill model.
+    for field in ("requires", "trains", "tests"):
+        raw_map = normalize_weight_map(skill_model.get(field, {}))
+        allowed = set(selected.get("micro_skills", [])) | set(selected.get("patterns", []))
+        remapped: Dict[str, float] = {}
+        for label, weight in raw_map.items():
+            mapped = label_mapping.get(label, label)
+            if mapped in allowed:
+                remapped[mapped] = max(remapped.get(mapped, 0.0), clamp01(weight))
+            else:
+                fallback = active_taxonomy.alias_to_label.get(mapped, mapped)
+                if fallback in allowed:
+                    remapped[fallback] = max(remapped.get(fallback, 0.0), clamp01(weight))
+                else:
+                    proposed["micro_skills"].append(mapped)
+                    issues.append(f"unknown_skill:{mapped}")
+        cleaned["skill_model"][field] = remapped
+
+    # Failure model.
+    common_failures = normalize_failure_model(failure_model.get("common_failures", {}))
+    allowed_failures = set(selected.get("failure_types", []))
+    allowed_affected = set(selected.get("micro_skills", [])) | set(selected.get("patterns", []))
+    remapped_failures: Dict[str, Dict[str, Any]] = {}
+    for failure, payload in common_failures.items():
+        mapped_failure = label_mapping.get(failure, failure)
+        if mapped_failure not in allowed_failures:
+            fallback = active_taxonomy.alias_to_label.get(mapped_failure, mapped_failure)
+            if fallback not in allowed_failures:
+                proposed["failure_types"].append(mapped_failure)
+                issues.append(f"unknown_failure:{mapped_failure}")
+                continue
+            mapped_failure = fallback
+        affected = []
+        for label in payload.get("affected_skills", []):
+            mapped = label_mapping.get(label, label)
+            if mapped in allowed_affected:
+                affected.append(mapped)
+            else:
+                fallback = active_taxonomy.alias_to_label.get(mapped, mapped)
+                if fallback in allowed_affected:
+                    affected.append(fallback)
+                else:
+                    proposed["micro_skills"].append(mapped)
+                    issues.append(f"unknown_affected_skill:{mapped}")
+        severity = clamp01(payload.get("severity", 0.0))
+        remapped_failures[mapped_failure] = {"affected_skills": dedupe(affected), "severity": severity}
+        if severity <= 0:
+            issues.append(f"failure_missing_severity:{mapped_failure}")
+        if not remapped_failures[mapped_failure]["affected_skills"]:
+            issues.append(f"failure_missing_affected:{mapped_failure}")
+    cleaned["failure_model"]["common_failures"] = remapped_failures
+
+    # Learning targets.
+    raw_targets = merged.get("learning_targets", [])
+    if isinstance(raw_targets, list):
+        for item in raw_targets:
+            if isinstance(item, dict):
+                label = normalize_taxonomy_label(item.get("label") or item.get("name"))
+            else:
+                label = normalize_taxonomy_label(item)
+            if not label:
+                continue
+            mapped = label_mapping.get(label, label)
+            if mapped in set(selected.get("learning_targets", [])):
+                cleaned["learning_targets"].append(mapped)
+            else:
+                fallback = active_taxonomy.alias_to_label.get(mapped, mapped)
+                if fallback in set(selected.get("learning_targets", [])):
+                    cleaned["learning_targets"].append(fallback)
+                else:
+                    proposed["learning_targets"].append(mapped)
+    cleaned["learning_targets"] = dedupe(cleaned["learning_targets"])
+
+    # Problem roles / traits.
+    cleaned["problem_roles"] = normalize_problem_roles(merged.get("problem_roles", {}))
+    cleaned["problem_traits"] = normalize_problem_traits(merged.get("problem_traits", {}))
+    for label in list(cleaned["problem_roles"].keys()):
+        mapped = label_mapping.get(label, label)
+        if mapped not in set(selected.get("problem_roles", [])):
+            proposed["problem_roles"].append(mapped)
+            issues.append(f"unknown_problem_role:{mapped}")
+            cleaned["problem_roles"].pop(label, None)
+    for label in list(cleaned["problem_traits"].keys()):
+        mapped = label_mapping.get(label, label)
+        if mapped not in set(selected.get("problem_traits", [])):
+            proposed["problem_traits"].append(mapped)
+            issues.append(f"unknown_problem_trait:{mapped}")
+            cleaned["problem_traits"].pop(label, None)
+
+    # Pattern cluster.
+    if cleaned["pattern_cluster"] and cleaned["pattern_cluster"] not in set(selected.get("pattern_clusters", [])):
+        proposed["pattern_clusters"].append(cleaned["pattern_cluster"])
+        issues.append(f"unknown_pattern_cluster:{cleaned['pattern_cluster']}")
+
+    # Proposed new labels.
+    merged_proposed = merged.get("proposed_new_labels") if isinstance(merged.get("proposed_new_labels"), dict) else {}
+    for category in CATEGORY_KEYS:
+        existing = normalize_label_list(merged_proposed.get(category, []))
+        proposed[category] = dedupe(list(proposed.get(category, [])) + existing)
+    cleaned["proposed_new_labels"] = proposed
+    cleaned["validation"]["needs_human_review"] = False
+    cleaned["validation"]["review_reasons"] = []
+
+    # Global validation checks.
+    raw_diff = normalize_label(routing_signals.get("difficulty_label", ""))
+    overall = cleaned["difficulty_vector"]["overall"]
+    if raw_diff == "easy" and overall > 0.75:
+        issues.append("easy_high_overall")
+    if raw_diff == "hard" and overall < 0.35:
+        issues.append("hard_low_overall")
+    if raw_diff == "easy" and max(cleaned["skill_model"]["requires"].values(), default=0.0) > 0.75:
+        issues.append("easy_high_requires")
+    if max(cleaned["skill_model"]["requires"].values(), default=0.0) > max(cleaned["skill_model"]["trains"].values(), default=0.0) + 0.05:
+        issues.append("requires_gt_trains")
+    if not cleaned["taxonomy"]["patterns"]:
+        issues.append("no_pattern")
+    if len(cleaned["taxonomy"]["micro_skills"]) < 3 and not (raw_diff == "easy" and overall <= TRIVIAL_EASY_THRESHOLD and len(cleaned["taxonomy"]["patterns"]) <= 1):
+        issues.append("too_few_micro_skills")
+    if not cleaned["skill_model"]["trains"]:
+        issues.append("empty_trains")
+    non_trivial = raw_diff != "easy" or overall > 0.35 or len(cleaned["taxonomy"]["patterns"]) > 1
+    if non_trivial and not cleaned["failure_model"]["common_failures"]:
+        issues.append("empty_failure_model")
+    if cleaned["metadata_confidence"] < 0.6:
+        issues.append("low_confidence")
+    if any(cleaned["proposed_new_labels"].get(k) for k in cleaned["proposed_new_labels"]):
+        issues.append("proposed_new_labels_present")
+    if cleaned["pattern_cluster"] and cleaned["pattern_cluster"] not in set(selected.get("pattern_clusters", [])):
+        issues.append("pattern_cluster_not_allowed")
+    if cleaned["topic_path"] and any(p not in set(selected.get("topic_paths", [])) for p in cleaned["topic_path"]):
+        issues.append("topic_path_not_allowed")
+
+    for label in cleaned["taxonomy"]["micro_skills"]:
+        if label in BROAD_MICRO_SKILLS:
+            issues.append(f"broad_micro_skill:{label}")
+    for label in cleaned["taxonomy"]["micro_skills"]:
+        if label in active_taxonomy.items_by_category["domains"] or label in active_taxonomy.items_by_category["algorithms"] or label in active_taxonomy.items_by_category["patterns"]:
+            issues.append(f"category_confusion:{label}")
+
+    # Missing or malformed top-level keys.
+    required = ["taxonomy", "topic_path", "difficulty_vector", "skill_model", "failure_model", "learning_targets", "problem_roles", "problem_traits", "pattern_cluster", "estimated_time_minutes", "solution_dna_summary", "metadata_confidence", "proposed_new_labels", "validation"]
+    for key in required:
+        if key not in cleaned:
+            issues.append(f"missing_{key}")
+
+    # Final validation state.
+    review_reasons = []
+    for issue in issues:
+        if issue.startswith("unknown_") or issue in {"low_confidence", "no_pattern", "too_few_micro_skills", "empty_trains", "empty_failure_model", "proposed_new_labels_present", "easy_high_overall", "hard_low_overall", "easy_high_requires", "requires_gt_trains", "pattern_cluster_not_allowed", "topic_path_not_allowed"}:
+            review_reasons.append(issue)
+    cleaned["validation"]["needs_human_review"] = bool(review_reasons)
+    cleaned["validation"]["review_reasons"] = dedupe(review_reasons)
+
+    return cleaned, dedupe(issues), proposed
+
+
+def classify_status(issues: Sequence[str]) -> str:
+    severe_prefixes = ("invalid_json", "missing_", "malformed_", "metadata_not_object", "unable_to_repair")
+    if any(issue.startswith(severe_prefixes) for issue in issues):
+        return "failed"
+    if issues:
+        return "needs_review"
+    return "valid"
+
+
+def prompt_template(subset: Dict[str, List[Dict[str, Any]]], topic_paths: List[str], fields: Dict[str, str], previous_metadata: Dict[str, Any]) -> str:
+    return f"""You are normalizing DSA problem metadata for a recommendation engine.
+
+You MUST use only the allowed taxonomy labels in the main fields.
+If a needed label is missing, put it in proposed_new_labels, but do not use it in main metadata.
+
+The recommender uses this metadata to:
+
+* recommend the next best question
+* estimate user skill mastery
+* detect weak areas
+* suggest what to learn or revise
+* recover after failure
+* avoid repetitive practice
+
+Allowed taxonomy subset:
+
+Domains:
+{format_allowed_items(subset["domains"])}
+
+Algorithms:
+{format_allowed_items(subset["algorithms"])}
+
+Patterns:
+{format_allowed_items(subset["patterns"])}
+
+Micro-skills:
+{format_allowed_items(subset["micro_skills"])}
+
+Failure types:
+{format_allowed_items(subset["failure_types"])}
+
+Pattern clusters:
+{format_allowed_items(subset["pattern_clusters"])}
+
+Learning targets:
+{format_allowed_items(subset["learning_targets"])}
+
+Problem roles:
+{format_allowed_items(subset["problem_roles"])}
+
+Problem traits:
+{format_allowed_items(subset["problem_traits"])}
+
+Topic hierarchy paths:
+{format_allowed_paths(topic_paths)}
 
 Problem:
-ID: {id}
-Title: {title}
-Difficulty: {difficulty}
-Tags: {tags}
-Statement: {statement}
-Examples: {examples}
-Constraints: {constraints}
-Hints: {hints}
-Solution/Editorial if available: {solution}
+ID: {fields['id']}
+Title: {fields['title']}
+Difficulty: {fields['difficulty']}
+Tags: {fields['tags']}
+Description: {fields['description']}
+Similar questions: {fields['similar_questions']}
 
-Previous messy metadata:
-{pass1_metadata}
+Previous noisy metadata:
+{json.dumps(previous_metadata, ensure_ascii=False, indent=2)}
 
-Return ONLY valid JSON:
+Return ONLY valid JSON in this exact shape:
 
 {{
 "taxonomy": {{
@@ -73,11 +1486,13 @@ Return ONLY valid JSON:
 "patterns": {{}},
 "micro_skills": {{}}
 }},
+"topic_path": [],
 "difficulty_vector": {{
 "overall": 0.0,
 "conceptual": 0.0,
 "implementation": 0.0,
-"edge_cases": 0.0
+"edge_cases": 0.0,
+"debugging": 0.0
 }},
 "skill_model": {{
 "requires": {{}},
@@ -87,14 +1502,9 @@ Return ONLY valid JSON:
 "failure_model": {{
 "common_failures": {{}}
 }},
-"learning_role": {{
-"first_exposure": 0.0,
-"practice": 0.0,
-"review": 0.0,
-"assessment": 0.0,
-"recovery": 0.0,
-"challenge": 0.0
-}},
+"learning_targets": [],
+"problem_roles": {{}},
+"problem_traits": {{}},
 "pattern_cluster": "",
 "estimated_time_minutes": 0,
 "solution_dna_summary": "",
@@ -105,738 +1515,363 @@ Return ONLY valid JSON:
 "patterns": [],
 "micro_skills": [],
 "failure_types": [],
-"pattern_clusters": []
+"pattern_clusters": [],
+"learning_targets": [],
+"problem_roles": [],
+"problem_traits": []
 }}
 }}
 
 Rules:
 
-* Main fields must use only allowed labels.
+* Use only allowed labels in main fields.
+* Use snake_case labels.
+* All weights must be between 0 and 1.
 * Use 1 to 3 domains.
 * Use 1 to 3 algorithms.
 * Use 1 to 4 patterns.
-* Use 3 to 10 micro_skills.
-* Weights should reflect importance, not just presence.
-* Do not add labels just because they appear in the title.
-* If multiple approaches exist, prefer the most educational/intended approach.
-* difficulty_vector values must be between 0 and 1.
-* metadata_confidence must be between 0 and 1.
-* common_failures must use only allowed failure_types.
-* affected_skills inside common_failures must use only allowed micro_skills or patterns.
-* pattern_cluster must use only allowed pattern_clusters.
-* Do not output markdown.
-* Do not include commentary outside JSON.
+* Use 3 to 10 micro_skills unless the problem is extremely trivial.
+* requires means prerequisite mastery before recommending this problem.
+* trains means skills improved by solving this problem.
+* tests means skills this problem can diagnose.
+* requires should usually be lower than trains.
+* Beginner-friendly Easy problems should not have high requires.
+* Every common_failure must have affected_skills or affected_patterns.
+* Failure severity must be between 0.1 and 1.0.
+* Do not use broad topics as micro_skills.
+* Do not use domains as algorithms.
+* Do not use algorithms as micro_skills.
+* Do not invent labels in main fields.
+* If unsure, lower metadata_confidence.
+* Do not output markdown or commentary.
 """
 
-BATCH_PROMPT_TEMPLATE = """You are normalizing DSA problem metadata using a fixed taxonomy.
 
-You MUST use only the allowed labels in the main fields.
-If a necessary label is missing, put it in proposed_new_labels, but do not use it in the main metadata.
+def repair_prompt(errors: Sequence[str], bad_output: str, subset: Dict[str, List[Dict[str, Any]]], topic_paths: List[str]) -> str:
+    return f"""Your previous JSON failed validation.
 
-Allowed domains:
-{allowed_domains}
+Validation errors:
+{json.dumps(list(errors), ensure_ascii=False, indent=2)}
 
-Allowed algorithms:
-{allowed_algorithms}
+Previous output:
+{bad_output}
 
-Allowed patterns:
-{allowed_patterns}
+Allowed taxonomy subset:
+{json.dumps({k: [x["label"] for x in subset[k]] for k in subset}, ensure_ascii=False, indent=2)}
 
-Allowed micro_skills:
-{allowed_micro_skills}
+Allowed topic paths:
+{format_allowed_paths(topic_paths)}
 
-Allowed failure_types:
-{allowed_failure_types}
-
-Allowed pattern_clusters:
-{allowed_pattern_clusters}
-
-You will be given a list of problems and their previous messy metadata.
-Return ONLY valid JSON containing a single object with a "results" key. The "results" object must map each problem ID to its clean metadata.
-
-Problems:
-{problems_text}
-
-Return ONLY valid JSON exactly in this shape:
-
-{{
-  "results": {{
-    "PROBLEM_ID_1": {{
-      "taxonomy": {{
-        "domains": {{}},
-        "algorithms": {{}},
-        "patterns": {{}},
-        "micro_skills": {{}}
-      }},
-      "difficulty_vector": {{
-        "overall": 0.0,
-        "conceptual": 0.0,
-        "implementation": 0.0,
-        "edge_cases": 0.0
-      }},
-      "skill_model": {{
-        "requires": {{}},
-        "trains": {{}},
-        "tests": {{}}
-      }},
-      "failure_model": {{
-        "common_failures": {{}}
-      }},
-      "learning_role": {{
-        "first_exposure": 0.0,
-        "practice": 0.0,
-        "review": 0.0,
-        "assessment": 0.0,
-        "recovery": 0.0,
-        "challenge": 0.0
-      }},
-      "pattern_cluster": "",
-      "estimated_time_minutes": 0,
-      "solution_dna_summary": "",
-      "metadata_confidence": 0.0,
-      "proposed_new_labels": {{
-        "domains": [],
-        "algorithms": [],
-        "patterns": [],
-        "micro_skills": [],
-        "failure_types": [],
-        "pattern_clusters": []
-      }}
-    }},
-    "PROBLEM_ID_2": {{ ... }}
-  }}
-}}
-
-Rules:
-
-* Return ONLY the JSON object.
-* Main fields must use only allowed labels.
-* Use 1 to 3 domains.
-* Use 1 to 3 algorithms.
-* Use 1 to 4 patterns.
-* Use 3 to 10 micro_skills.
-* Weights should reflect importance, not just presence.
-* Do not add labels just because they appear in the title.
-* If multiple approaches exist, prefer the most educational/intended approach.
-* difficulty_vector values must be between 0 and 1.
-* metadata_confidence must be between 0 and 1.
-* common_failures must use only allowed failure_types.
-* affected_skills inside common_failures must use only allowed micro_skills or patterns.
-* pattern_cluster must use only allowed pattern_clusters.
-* Do not output markdown.
-* Do not include commentary outside JSON.
+Fix the JSON.
+Return ONLY valid JSON.
+Do not add explanations.
+Use only allowed labels in main fields.
+If a label is missing, place it in proposed_new_labels.
+Every common_failure must have affected_skills or affected_patterns.
+All weights must be between 0 and 1.
 """
 
-@log_execution
-def setup_global_logger() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-    )
 
-
-@log_execution
-def build_problem_fields(raw: Dict[str, Any]) -> Dict[str, str]:
-    return {
-        "id": str(raw.get("id") or raw.get("problem_id") or raw.get("question_id") or raw.get("slug") or ""),
-        "title": extract_text_value(raw, ("title", "name", "question_title", "problem_title")),
-        "difficulty": extract_text_value(raw, ("difficulty", "level", "difficulty_level")),
-        "tags": extract_text_value(raw, ("tags", "tag", "topic_tags", "category")),
-        "statement": extract_text_value(raw, ("statement", "problem", "description", "content", "question", "body")),
-        "examples": extract_text_value(raw, ("examples", "example", "sample_input_output", "sample")),
-        "constraints": extract_text_value(raw, ("constraints", "constraint", "limits")),
-        "hints": extract_text_value(raw, ("hints", "hint", "guidance")),
-        "solution": extract_text_value(raw, ("solution", "editorial", "analysis", "explanation", "approach")),
-    }
-
-
-@log_execution
-def extract_json(text: str) -> Dict[str, Any]:
-    text = text.strip()
-    if not text:
-        raise ValueError("empty response")
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        start = text.find("{")
-        end = text.rfind("}")
-        if start != -1 and end != -1 and end > start:
-            return json.loads(text[start : end + 1])
-        raise
-
-
-@log_execution
-def load_taxonomy(path: Path) -> Dict[str, List[str]]:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        raise ValueError("taxonomy must be a JSON object")
-    for key in ("domains", "algorithms", "patterns", "micro_skills", "failure_types", "pattern_clusters"):
-        values = data.get(key, [])
-        if isinstance(values, list):
-            data[key] = [normalize_label(value) for value in values if normalize_label(value)]
-        else:
-            data[key] = []
-    return data
-
-
-@log_execution
-def load_label_mapping(path: Path) -> Dict[str, Dict[str, str]]:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        raise ValueError("label mapping must be a JSON object")
-    for key in ("domains", "algorithms", "patterns", "micro_skills", "failure_types", "pattern_clusters"):
-        values = data.get(key, {})
-        if isinstance(values, dict):
-            data[key] = {normalize_label(k): normalize_label(v) for k, v in values.items() if normalize_label(k) and normalize_label(v)}
-        else:
-            data[key] = {}
-    return data
-
-
-@log_execution
-def format_allowed_list(values: Sequence[str]) -> str:
-    if not values:
-        return "[]"
-    return json.dumps(list(values), ensure_ascii=False, indent=2)
-
-
-@log_execution
-def select_top_items(weight_map: Dict[str, float], max_items: int) -> Dict[str, float]:
-    items = sorted(weight_map.items(), key=lambda item: (-float(item[1]), item[0]))
-    selected = items[:max_items]
-    return {label: clamp01(weight) for label, weight in selected if label}
-
-
-@log_execution
-def remap_with_lookup(
-    values: Dict[str, float],
-    *,
-    category: str,
-    mapping: Dict[str, Dict[str, str]],
-    allowed: Sequence[str],
-) -> tuple[Dict[str, float], List[str]]:
-    category_map = mapping.get(category, {})
-    allowed_set = {normalize_label(x) for x in allowed}
-    remapped: Dict[str, float] = {}
-    proposed: List[str] = []
-    for label, weight in values.items():
-        normalized = normalize_label(label)
-        if not normalized:
-            continue
-        mapped = category_map.get(normalized, normalized)
-        if mapped in allowed_set:
-            remapped[mapped] = max(remapped.get(mapped, 0.0), clamp01(weight))
-        else:
-            proposed.append(mapped)
-    return remapped, sorted(set(proposed))
-
-
-@log_execution
-def remap_label(
-    label: str,
-    *,
-    category: str,
-    mapping: Dict[str, Dict[str, str]],
-    allowed: Sequence[str],
-) -> tuple[str, bool]:
-    normalized = normalize_label(label)
-    mapped = mapping.get(category, {}).get(normalized, normalized)
-    allowed_set = {normalize_label(x) for x in allowed}
-    return (mapped if mapped in allowed_set else normalized), mapped in allowed_set
-
-
-@log_execution
-def remap_skill_label(
-    label: str,
-    *,
-    mapping: Dict[str, Dict[str, str]],
-    allowed_micro_skills: Sequence[str],
-    allowed_patterns: Sequence[str],
-) -> tuple[str, bool]:
-    normalized = normalize_label(label)
-    candidate = mapping.get("micro_skills", {}).get(normalized, normalized)
-    if candidate in {normalize_label(x) for x in allowed_micro_skills}:
-        return candidate, True
-    candidate = mapping.get("patterns", {}).get(normalized, candidate)
-    if candidate in {normalize_label(x) for x in allowed_patterns}:
-        return candidate, True
-    return normalized, False
-
-
-@log_execution
-def remap_skill_weight_map(
-    weight_map: Dict[str, float],
-    *,
-    mapping: Dict[str, Dict[str, str]],
-    allowed_micro_skills: Sequence[str],
-    allowed_patterns: Sequence[str],
-) -> tuple[Dict[str, float], List[str]]:
-    remapped: Dict[str, float] = {}
-    proposed: List[str] = []
-    for label, weight in weight_map.items():
-        mapped, allowed = remap_skill_label(
-            label,
-            mapping=mapping,
-            allowed_micro_skills=allowed_micro_skills,
-            allowed_patterns=allowed_patterns,
-        )
-        if allowed:
-            remapped[mapped] = max(remapped.get(mapped, 0.0), clamp01(weight))
-        else:
-            proposed.append(mapped)
-    return remapped, sorted(set(proposed))
-
-
-@log_execution
-def sanitize_proposed_labels(data: Any) -> Dict[str, List[str]]:
-    empty = {
-        "domains": [],
-        "algorithms": [],
-        "patterns": [],
-        "micro_skills": [],
-        "failure_types": [],
-        "pattern_clusters": [],
-    }
-    if not isinstance(data, dict):
-        return empty
-    for key in empty.keys():
-        items = data.get(key, [])
-        if isinstance(items, list):
-            empty[key] = [normalize_label(x) for x in items if normalize_label(x)]
-    return empty
-
-
-@log_execution
-def merge_unique_lists(*lists: Iterable[str]) -> List[str]:
-    seen = set()
-    out: List[str] = []
-    for lst in lists:
-        for item in lst:
-            item = normalize_label(item)
-            if item and item not in seen:
-                seen.add(item)
-                out.append(item)
-    return out
-
-
-@log_execution
-def _process_pass3_parsed_json(
-    parsed: Dict[str, Any],
-    raw_difficulty: str,
-    *,
-    taxonomy: Dict[str, List[str]],
-    mapping: Dict[str, Dict[str, str]]
-) -> tuple[Dict[str, Any], List[str]]:
-    cleaned, _ = sanitize_metadata_shape(parsed, include_proposed=True)
-    proposed = sanitize_proposed_labels(cleaned.get("proposed_new_labels"))
-
-    taxonomy_payload = cleaned["taxonomy"]
-    filtered_taxonomy: Dict[str, Dict[str, float]] = {}
-    proposed_additions: Dict[str, List[str]] = {k: list(v) for k, v in proposed.items()}
-
-    for category, max_items in (
-        ("domains", 3),
-        ("algorithms", 3),
-        ("patterns", 4),
-        ("micro_skills", 10),
-    ):
-        remapped, extra = remap_with_lookup(
-            taxonomy_payload.get(category, {}),
-            category=category,
-            mapping=mapping,
-            allowed=taxonomy[category],
-        )
-        filtered_taxonomy[category] = select_top_items(remapped, max_items)
-        proposed_additions[category] = merge_unique_lists(proposed_additions.get(category, []), extra)
-
-    skill_model = cleaned["skill_model"]
-    remapped_requires, extra_requires = remap_skill_weight_map(
-        skill_model.get("requires", {}),
-        mapping=mapping,
-        allowed_micro_skills=taxonomy["micro_skills"],
-        allowed_patterns=taxonomy["patterns"],
-    )
-    remapped_trains, extra_trains = remap_skill_weight_map(
-        skill_model.get("trains", {}),
-        mapping=mapping,
-        allowed_micro_skills=taxonomy["micro_skills"],
-        allowed_patterns=taxonomy["patterns"],
-    )
-    remapped_tests, extra_tests = remap_skill_weight_map(
-        skill_model.get("tests", {}),
-        mapping=mapping,
-        allowed_micro_skills=taxonomy["micro_skills"],
-        allowed_patterns=taxonomy["patterns"],
-    )
-    proposed_additions["micro_skills"] = merge_unique_lists(
-        proposed_additions.get("micro_skills", []),
-        extra_requires,
-        extra_trains,
-        extra_tests,
-    )
-
-    failure_model = cleaned["failure_model"]
-    failure_payload = failure_model.get("common_failures", {})
-    allowed_failure_types = {normalize_label(x) for x in taxonomy["failure_types"]}
-    allowed_affected = merge_unique_lists(taxonomy["micro_skills"], taxonomy["patterns"])
-    remapped_failures: Dict[str, Dict[str, Any]] = {}
-    for failure_name, payload in failure_payload.items():
-        failure_key, allowed_failure = remap_label(
-            failure_name,
-            category="failure_types",
-            mapping=mapping,
-            allowed=taxonomy["failure_types"],
-        )
-        if not allowed_failure:
-            proposed_additions["failure_types"] = merge_unique_lists(proposed_additions.get("failure_types", []), [failure_key])
-            continue
-        affected = []
-        if isinstance(payload, dict):
-            raw_affected = payload.get("affected_skills", [])
-            if isinstance(raw_affected, (list, tuple)):
-                for item in raw_affected:
-                    mapped, allowed_skill = remap_skill_label(
-                        item,
-                        mapping=mapping,
-                        allowed_micro_skills=taxonomy["micro_skills"],
-                        allowed_patterns=taxonomy["patterns"],
-                    )
-                    if allowed_skill and mapped in allowed_affected:
-                        affected.append(mapped)
-                    else:
-                        proposed_additions["micro_skills"] = merge_unique_lists(proposed_additions.get("micro_skills", []), [mapped])
-        remapped_failures[failure_key] = {
-            "affected_skills": merge_unique_lists(affected),
-            "severity": clamp01(payload.get("severity", 0.0)) if isinstance(payload, dict) else 0.0,
-        }
-
-    pattern_cluster = normalize_label(cleaned.get("pattern_cluster", ""))
-    mapped_cluster = mapping.get("pattern_clusters", {}).get(pattern_cluster, pattern_cluster)
-    if mapped_cluster not in {normalize_label(x) for x in taxonomy["pattern_clusters"]}:
-        if mapped_cluster:
-            proposed_additions["pattern_clusters"] = merge_unique_lists(
-                proposed_additions.get("pattern_clusters", []),
-                [mapped_cluster],
+def call_llm(prompt: str, model: str, ollama_url: str, timeout: int, retries: int, temperature: float, sleep_between_requests: float) -> tuple[Dict[str, Any] | None, str | None, str | None]:
+    last_error = None
+    last_raw = None
+    for attempt in range(1, retries + 1):
+        try:
+            response = generate(
+                prompt=prompt,
+                model=model,
+                ollama_url=ollama_url,
+                timeout=timeout,
+                retries=1,
+                temperature=temperature,
+                sleep_between_requests=sleep_between_requests,
+                prefer_json=True,
             )
-        mapped_cluster = ""
-
-    metadata = {
-        "taxonomy": filtered_taxonomy,
-        "difficulty_vector": cleaned["difficulty_vector"],
-        "skill_model": {
-            "requires": select_top_items(remapped_requires, 10),
-            "trains": select_top_items(remapped_trains, 10),
-            "tests": select_top_items(remapped_tests, 10),
-        },
-        "failure_model": {
-            "common_failures": remapped_failures,
-        },
-        "learning_role": cleaned["learning_role"],
-        "pattern_cluster": mapped_cluster,
-        "estimated_time_minutes": clamp_int(cleaned.get("estimated_time_minutes", 0), default=0, minimum=0, maximum=240),
-        "solution_dna_summary": str(cleaned.get("solution_dna_summary", "") or "").strip(),
-        "metadata_confidence": clamp01(cleaned.get("metadata_confidence", 0.0)),
-        "proposed_new_labels": {
-            "domains": merge_unique_lists(proposed_additions.get("domains", [])),
-            "algorithms": merge_unique_lists(proposed_additions.get("algorithms", [])),
-            "patterns": merge_unique_lists(proposed_additions.get("patterns", [])),
-            "micro_skills": merge_unique_lists(proposed_additions.get("micro_skills", [])),
-            "failure_types": merge_unique_lists(proposed_additions.get("failure_types", [])),
-            "pattern_clusters": merge_unique_lists(proposed_additions.get("pattern_clusters", [])),
-        },
-    }
-
-    metadata["taxonomy"]["domains"] = select_top_items(metadata["taxonomy"]["domains"], 3)
-    metadata["taxonomy"]["algorithms"] = select_top_items(metadata["taxonomy"]["algorithms"], 3)
-    metadata["taxonomy"]["patterns"] = select_top_items(metadata["taxonomy"]["patterns"], 4)
-    metadata["taxonomy"]["micro_skills"] = select_top_items(metadata["taxonomy"]["micro_skills"], 10)
-
-    issues = validate_pass3_metadata(
-        metadata,
-        raw_difficulty=raw_difficulty,
-        allowed_domains=taxonomy["domains"],
-        allowed_algorithms=taxonomy["algorithms"],
-        allowed_patterns=taxonomy["patterns"],
-        allowed_micro_skills=taxonomy["micro_skills"],
-        allowed_failure_types=taxonomy["failure_types"],
-        allowed_pattern_clusters=taxonomy["pattern_clusters"],
-    )
-    
-    if metadata["proposed_new_labels"]:
-        if any(metadata["proposed_new_labels"].values()) and "proposed_new_labels_present" not in issues:
-            issues.append("proposed_new_labels_present")
-            
-    return metadata, issues if isinstance(issues, list) else []
+            last_raw = response.response_text
+            parsed = extract_json(response.response_text)
+            return parsed, response.response_text, None
+        except Exception as exc:
+            last_error = str(exc)
+            logger.warning("LLM attempt %s/%s failed: %s", attempt, retries, exc)
+    return None, last_raw, last_error
 
 
-@log_execution
-def enrich_row(
+def process_row(
     raw: Dict[str, Any],
-    previous_metadata: Dict[str, Any],
+    pass1_metadata: Dict[str, Any],
     *,
-    taxonomy: Dict[str, List[str]],
-    mapping: Dict[str, Dict[str, str]],
+    active_taxonomy: LoadedTaxonomy,
+    master_taxonomy: LoadedTaxonomy,
+    label_mapping: Mapping[str, str],
+    topic_hierarchy: List[Dict[str, Any]],
     model: str,
     ollama_url: str,
     timeout: int,
     retries: int,
     temperature: float,
     sleep_between_requests: float,
-) -> tuple[Dict[str, Any] | None, str | None, str | None, List[str]]:
+    dry_run: bool = False,
+    write_dry_run: bool = False,
+    debug: bool = False,
+) -> tuple[Dict[str, Any] | None, Dict[str, Any] | None, List[str], str | None, str | None]:
     fields = build_problem_fields(raw)
-    prompt = PROMPT_TEMPLATE.format(
-        allowed_domains=format_allowed_list(taxonomy["domains"]),
-        allowed_algorithms=format_allowed_list(taxonomy["algorithms"]),
-        allowed_patterns=format_allowed_list(taxonomy["patterns"]),
-        allowed_micro_skills=format_allowed_list(taxonomy["micro_skills"]),
-        allowed_failure_types=format_allowed_list(taxonomy["failure_types"]),
-        allowed_pattern_clusters=format_allowed_list(taxonomy["pattern_clusters"]),
-        pass1_metadata=json.dumps(previous_metadata, ensure_ascii=False, indent=2),
-        **fields,
-    )
+    routing = build_routing_signals(raw, pass1_metadata)
+    subset = select_taxonomy_subset(routing, active_taxonomy, topic_hierarchy, label_mapping)
+    prompt = prompt_template(subset, subset["topic_paths"], fields, pass1_metadata)
 
-    last_error = None
-    for attempt in range(1, retries + 1):
-        try:
-            response = generate(
-                prompt=prompt,
-                model=model,
-                ollama_url=ollama_url,
-                timeout=timeout,
-                retries=1,
-                temperature=temperature,
-                sleep_between_requests=sleep_between_requests,
-                prefer_json=True,
-            )
-            parsed = extract_json(response.response_text)
-            
-            metadata, issues = _process_pass3_parsed_json(
-                parsed, fields["difficulty"], taxonomy=taxonomy, mapping=mapping
-            )
-            
-            return metadata, response.raw, None, issues
-        except Exception as exc:
-            last_error = str(exc)
-            logger.warning("Failed to parse/validate pass3 JSON for %s on attempt %s/%s: %s", fields["id"], attempt, retries, exc)
-            if attempt < retries:
-                continue
-            return None, response.raw if 'response' in locals() else None, last_error, [f"invalid_json:{last_error}"]
-    return None, None, last_error or "unexpected_failure", [last_error or "unexpected_failure"]
+    if dry_run or debug:
+        logger.info("Routing signals for %s: %s", fields["id"], json.dumps(routing, ensure_ascii=False, indent=2))
+        logger.info("Selected subset for %s: %s", fields["id"], json.dumps({k: subset[k] for k in CATEGORY_KEYS}, ensure_ascii=False, indent=2))
+        logger.info("Prompt preview for %s:\n%s", fields["id"], prompt[:2000])
+
+    if dry_run and not write_dry_run:
+        return None, None, [], None, None
+
+    parsed, raw_response_text, error = call_llm(prompt, model, ollama_url, timeout, retries, temperature, sleep_between_requests)
+    if parsed is None:
+        return None, None, [f"invalid_json:{error or 'unknown_error'}"], raw_response_text, error
+
+    candidate, issues, proposed = sanitize_final_metadata(parsed, subset, active_taxonomy, label_mapping, routing)
+    status = classify_status(issues)
+
+    if status == "valid":
+        return candidate, {"status": status, "issues": issues}, issues, raw_response_text, None
+
+    repair = repair_prompt(issues, raw_response_text or json.dumps(parsed, ensure_ascii=False), subset, subset["topic_paths"])
+    repaired, repaired_raw, repair_error = call_llm(repair, model, ollama_url, timeout, 1, temperature, sleep_between_requests)
+    if repaired is None:
+        return candidate if candidate else None, {"status": "failed", "issues": issues}, issues + [f"unable_to_repair:{repair_error or 'unknown_error'}"], raw_response_text, repair_error
+
+    candidate2, issues2, _ = sanitize_final_metadata(repaired, subset, active_taxonomy, label_mapping, routing)
+    if not candidate2:
+        return None, {"status": "failed", "issues": issues2}, issues2, repaired_raw, repair_error
+
+    status2 = classify_status(issues2)
+    if status2 == "failed":
+        return None, {"status": "failed", "issues": issues2}, issues2, repaired_raw, repair_error
+    return candidate2, {"status": status2, "issues": issues2}, issues2, repaired_raw, repair_error
 
 
-@log_execution
-def enrich_batch(
-    raw_list: List[Tuple[Dict[str, Any], Dict[str, Any]]],
-    *,
-    taxonomy: Dict[str, List[str]],
-    mapping: Dict[str, Dict[str, str]],
-    model: str,
-    ollama_url: str,
-    timeout: int,
-    retries: int,
-    temperature: float,
-    sleep_between_requests: float,
-) -> tuple[Dict[str, Dict[str, Any]], Dict[str, List[str]], str | None, str | None]:
-    
-    problems_text = ""
-    for raw, previous_metadata in raw_list:
-        fields = build_problem_fields(raw)
-        pass1_json = json.dumps(previous_metadata, ensure_ascii=False, indent=2)
-        problems_text += f"---\nID: {fields['id']}\nTitle: {fields['title']}\nDifficulty: {fields['difficulty']}\nTags: {fields['tags']}\nStatement: {fields['statement']}\nExamples: {fields['examples']}\nConstraints: {fields['constraints']}\nHints: {fields['hints']}\nSolution/Editorial: {fields['solution']}\nPrevious messy metadata:\n{pass1_json}\n\n"
+def bucket_difficulty(value: float) -> str:
+    for threshold, label in DIFFICULTY_BUCKETS:
+        if value < threshold:
+            return label
+    return "0.8-1.0"
 
-    prompt = BATCH_PROMPT_TEMPLATE.format(
-        allowed_domains=format_allowed_list(taxonomy["domains"]),
-        allowed_algorithms=format_allowed_list(taxonomy["algorithms"]),
-        allowed_patterns=format_allowed_list(taxonomy["patterns"]),
-        allowed_micro_skills=format_allowed_list(taxonomy["micro_skills"]),
-        allowed_failure_types=format_allowed_list(taxonomy["failure_types"]),
-        allowed_pattern_clusters=format_allowed_list(taxonomy["pattern_clusters"]),
-        problems_text=problems_text
-    )
 
-    last_error = None
-    for attempt in range(1, retries + 1):
-        try:
-            response = generate(
-                prompt=prompt,
-                model=model,
-                ollama_url=ollama_url,
-                timeout=timeout,
-                retries=1,
-                temperature=temperature,
-                sleep_between_requests=sleep_between_requests,
-                prefer_json=True,
-            )
-            parsed = extract_json(response.response_text)
-            
-            if "results" not in parsed:
-                raise ValueError("Missing 'results' key in batch output.")
-                
-            results_out = {}
-            issues_out = {}
-            
-            # Create a lookup for difficulty
-            difficulty_lookup = {build_problem_fields(raw)["id"]: build_problem_fields(raw)["difficulty"] for raw, _ in raw_list}
-            
-            for pid, metadata in parsed["results"].items():
-                diff = difficulty_lookup.get(pid, "")
-                sanitized, issues = _process_pass3_parsed_json(
-                    metadata, diff, taxonomy=taxonomy, mapping=mapping
-                )
-                results_out[pid] = sanitized
-                issues_out[pid] = issues
-                
-            return results_out, issues_out, response.raw, None
-        except Exception as exc:
-            last_error = str(exc)
-            logger.warning("Failed to parse/validate pass3 JSON for batch of size %s on attempt %s/%s: %s", len(raw_list), attempt, retries, exc)
-            if attempt < retries:
-                continue
-            return {}, {}, response.raw if 'response' in locals() else None, last_error
-    return {}, {}, None, last_error or "unexpected_failure"
+def bucket_confidence(value: float) -> str:
+    return bucket_difficulty(value)
 
-@log_execution
-def build_report(
-    *,
-    total: int,
-    valid_count: int,
-    needs_review_count: int,
-    failed_count: int,
-    proposed_counter: Counter,
-    issue_counter: Counter,
-    lowest_confidence_rows: List[Dict[str, Any]],
-    domain_counter: Counter,
-    algorithm_counter: Counter,
-    pattern_counter: Counter,
-    difficulty_buckets: Counter,
-) -> str:
+
+def update_summary(summary: Dict[str, Any], metadata: Dict[str, Any], issues: Sequence[str], row: Dict[str, Any]) -> None:
+    status = classify_status(issues)
+    summary["total"] += 1
+    summary[f"{status}_count"] += 1
+    summary["issue_counter"].update(issues)
+
+    if any(metadata.get("proposed_new_labels", {}).get(k) for k in metadata.get("proposed_new_labels", {})):
+        summary["proposed_counter"].update(
+            label for labels in metadata.get("proposed_new_labels", {}).values() for label in labels
+        )
+
+    diff = metadata.get("difficulty_vector", {})
+    overall = float(diff.get("overall", 0.0) or 0.0) if isinstance(diff, dict) else 0.0
+    summary["difficulty_counter"][bucket_difficulty(overall)] += 1
+
+    confidence = float(metadata.get("metadata_confidence", 0.0) or 0.0)
+    summary["confidence_counter"][bucket_confidence(confidence)] += 1
+
+    for label in metadata.get("taxonomy", {}).get("domains", {}):
+        summary["domain_counter"][label] += 1
+    for label in metadata.get("taxonomy", {}).get("algorithms", {}):
+        summary["algorithm_counter"][label] += 1
+    for label in metadata.get("taxonomy", {}).get("patterns", {}):
+        summary["pattern_counter"][label] += 1
+    for label in metadata.get("taxonomy", {}).get("micro_skills", {}):
+        summary["micro_skill_counter"][label] += 1
+
+    req = metadata.get("skill_model", {}).get("requires", {})
+    trains = metadata.get("skill_model", {}).get("trains", {})
+    fail = metadata.get("failure_model", {}).get("common_failures", {})
+    if max(req.values(), default=0.0) > max(trains.values(), default=0.0) + 0.05:
+        summary["suspicious_requires"].append(
+            {"problem_id": row["problem_id"], "reason": "requires_gt_trains", "title": row["raw"].get("title", "")}
+        )
+    if not fail or all(not payload.get("affected_skills") and not payload.get("affected_patterns") if isinstance(payload, dict) else True for payload in fail.values()):
+        summary["weak_failure_models"].append(
+            {"problem_id": row["problem_id"], "reason": "empty_or_weak_failure_model", "title": row["raw"].get("title", "")}
+        )
+    if status == "needs_review":
+        summary["needs_review_examples"].append(
+            {
+                "problem_id": row["problem_id"],
+                "title": row["raw"].get("title", ""),
+                "issues": list(issues)[:10],
+            }
+        )
+    if any(issue.startswith("unknown_") for issue in issues):
+        summary["outside_taxonomy"].append(
+            {"problem_id": row["problem_id"], "issues": [i for i in issues if i.startswith("unknown_")]}
+        )
+
+
+def build_report(summary: Dict[str, Any]) -> str:
     lines = [
-        "# Final Validation Report",
+        "# Pass 3 Validation Report",
         "",
-        f"- Total processed: {total}",
-        f"- Valid: {valid_count}",
-        f"- Needs review: {needs_review_count}",
-        f"- Failed: {failed_count}",
+        f"- Total rows: {summary['total']}",
+        f"- Valid count: {summary['valid_count']}",
+        f"- Needs review count: {summary['needs_review_count']}",
+        f"- Failed count: {summary['failed_count']}",
         "",
-        "## Top Proposed New Labels",
+        "## Top Validation Issues",
     ]
-    if proposed_counter:
-        for label, freq in proposed_counter.most_common(50):
-            lines.append(f"- `{label}`: {freq}")
-    else:
-        lines.append("- None")
-    lines.extend(["", "## Common Validation Issues"])
-    if issue_counter:
-        for label, freq in issue_counter.most_common(50):
+    if summary["issue_counter"]:
+        for label, freq in summary["issue_counter"].most_common(50):
             lines.append(f"- `{label}`: {freq}")
     else:
         lines.append("- None")
 
-    lines.extend(["", "## Lowest Metadata Confidence Rows"])
-    if lowest_confidence_rows:
-        for item in lowest_confidence_rows[:20]:
-            lines.append(
-                f"- `{item['problem_id']}`: confidence={item['confidence']:.3f}, status={item['status']}, issues={item['issues']}"
-            )
-    else:
-        lines.append("- None")
-
-    lines.extend(["", "## Domain Distribution"])
-    if domain_counter:
-        for label, freq in domain_counter.most_common(50):
+    lines.extend(["", "## Top Proposed New Labels"])
+    if summary["proposed_counter"]:
+        for label, freq in summary["proposed_counter"].most_common(50):
             lines.append(f"- `{label}`: {freq}")
     else:
         lines.append("- None")
 
-    lines.extend(["", "## Algorithm Distribution"])
-    if algorithm_counter:
-        for label, freq in algorithm_counter.most_common(50):
-            lines.append(f"- `{label}`: {freq}")
-    else:
-        lines.append("- None")
-
-    lines.extend(["", "## Pattern Distribution"])
-    if pattern_counter:
-        for label, freq in pattern_counter.most_common(50):
-            lines.append(f"- `{label}`: {freq}")
-    else:
-        lines.append("- None")
+    lines.extend(["", "## Metadata Confidence Distribution"])
+    for bucket, freq in summary["confidence_counter"].items():
+        lines.append(f"- `{bucket}`: {freq}")
 
     lines.extend(["", "## Difficulty Distribution"])
-    for bucket, freq in difficulty_buckets.items():
+    for bucket, freq in summary["difficulty_counter"].items():
         lines.append(f"- `{bucket}`: {freq}")
+
+    lines.extend(["", "## Top Domains"])
+    if summary["domain_counter"]:
+        for label, freq in summary["domain_counter"].most_common(30):
+            lines.append(f"- `{label}`: {freq}")
+    else:
+        lines.append("- None")
+
+    lines.extend(["", "## Top Algorithms"])
+    if summary["algorithm_counter"]:
+        for label, freq in summary["algorithm_counter"].most_common(30):
+            lines.append(f"- `{label}`: {freq}")
+    else:
+        lines.append("- None")
+
+    lines.extend(["", "## Top Patterns"])
+    if summary["pattern_counter"]:
+        for label, freq in summary["pattern_counter"].most_common(30):
+            lines.append(f"- `{label}`: {freq}")
+    else:
+        lines.append("- None")
+
+    lines.extend(["", "## Top Micro-Skills"])
+    if summary["micro_skill_counter"]:
+        for label, freq in summary["micro_skill_counter"].most_common(40):
+            lines.append(f"- `{label}`: {freq}")
+    else:
+        lines.append("- None")
+
+    lines.extend(["", "## Suspicious Requires"])
+    if summary["suspicious_requires"]:
+        for item in summary["suspicious_requires"][:20]:
+            lines.append(f"- `{item['problem_id']}` ({item['title']}): {item['reason']}")
+    else:
+        lines.append("- None")
+
+    lines.extend(["", "## Weak Failure Models"])
+    if summary["weak_failure_models"]:
+        for item in summary["weak_failure_models"][:20]:
+            lines.append(f"- `{item['problem_id']}` ({item['title']}): {item['reason']}")
+    else:
+        lines.append("- None")
+
+    lines.extend(["", "## Labels Outside Allowed Taxonomy"])
+    if summary["outside_taxonomy"]:
+        for item in summary["outside_taxonomy"][:20]:
+            lines.append(f"- `{item['problem_id']}`: {item['issues']}")
+    else:
+        lines.append("- None")
+
+    lines.extend(["", "## Needs Review Examples"])
+    if summary["needs_review_examples"]:
+        for item in summary["needs_review_examples"][:20]:
+            lines.append(f"- `{item['problem_id']}` ({item['title']}): {item['issues']}")
+    else:
+        lines.append("- None")
 
     return "\n".join(lines) + "\n"
 
 
-@log_execution
-def bucket_difficulty(value: float) -> str:
-    if value < 0.2:
-        return "0.0-0.2"
-    if value < 0.4:
-        return "0.2-0.4"
-    if value < 0.6:
-        return "0.4-0.6"
-    if value < 0.8:
-        return "0.6-0.8"
-    return "0.8-1.0"
-
-
-@log_execution
 def main() -> int:
     setup_global_logger()
 
-    parser = argparse.ArgumentParser(description="Run constrained pass 3 enrichment.")
-    parser.add_argument("--input", required=True, help="Input raw or pass1 JSONL")
-    parser.add_argument("--taxonomy", required=True, help="Clean taxonomy JSON")
-    parser.add_argument("--label-mapping", required=True, help="Canonical label mapping JSON")
-    parser.add_argument("--output", required=True, help="Final JSONL output")
-    parser.add_argument("--failures", required=True, help="Failure JSONL output")
-    parser.add_argument("--report", required=True, help="Final validation report markdown")
+    parser = argparse.ArgumentParser(description="Run constrained pass 3 DSA metadata enrichment.")
+    parser.add_argument("--input", default="data/intermediate/pass1_enriched.jsonl")
+    parser.add_argument("--master-taxonomy", default="data/processed/master_taxonomy.json")
+    parser.add_argument("--active-taxonomy", default="data/processed/active_taxonomy.json")
+    parser.add_argument("--label-mapping", default="data/processed/label_mapping.json")
+    parser.add_argument("--topic-hierarchy", default="data/processed/topic_hierarchy.json")
+    parser.add_argument("--output", default="data/processed/problems_enriched_final.jsonl")
+    parser.add_argument("--review-output", default="data/processed/pass3_needs_review.jsonl")
+    parser.add_argument("--failures", default="data/failures/pass3_failures.jsonl")
+    parser.add_argument("--report", default="data/processed/pass3_validation_report.md")
     parser.add_argument("--model", default="qwen2.5-coder:14b")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--start-index", type=int, default=0)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--force", action="store_true")
-    parser.add_argument("--sleep-between-requests", type=float, default=0.0)
     parser.add_argument("--ollama-url", default="http://localhost:11434")
+    parser.add_argument("--sleep-between-requests", type=float, default=0.0)
     parser.add_argument("--timeout", type=int, default=120)
     parser.add_argument("--retries", type=int, default=3)
-    parser.add_argument("--temperature", type=float, default=0.2)
-    parser.add_argument("--batch-size", type=int, default=1)
-    parser.add_argument("--max-workers", type=int, default=3, help="Number of concurrent threads")
+    parser.add_argument("--temperature", type=float, default=0.1)
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--write-dry-run", action="store_true")
+    parser.add_argument("--debug-problem-id", default="")
     args = parser.parse_args()
 
     input_path = Path(args.input)
-    taxonomy_path = Path(args.taxonomy)
-    mapping_path = Path(args.label_mapping)
+    master_taxonomy = load_taxonomy_file(Path(args.master_taxonomy))
+    active_taxonomy = load_taxonomy_file(Path(args.active_taxonomy))
+    label_mapping = load_flat_mapping(Path(args.label_mapping))
+    topic_hierarchy = load_topic_hierarchy(Path(args.topic_hierarchy))
+
     output_path = ensure_parent_dir(args.output)
+    review_path = ensure_parent_dir(args.review_output)
     failures_path = ensure_parent_dir(args.failures)
     report_path = ensure_parent_dir(args.report)
 
     if args.force:
-        for path in (output_path, failures_path, report_path):
+        for path in (output_path, review_path, failures_path, report_path):
             if path.exists():
                 path.unlink()
 
-    taxonomy = load_taxonomy(taxonomy_path)
-    mapping = load_label_mapping(mapping_path)
     records = load_input_records(input_path)
     existing_ids = read_existing_ids(output_path) if args.resume and not args.force else set()
+    logger.info("Loaded %s input rows from %s", len(records), input_path)
 
-    total = 0
-    valid_count = 0
-    needs_review_count = 0
-    failed_count = 0
-    proposed_counter: Counter = Counter()
-    issue_counter: Counter = Counter()
-    domain_counter: Counter = Counter()
-    algorithm_counter: Counter = Counter()
-    pattern_counter: Counter = Counter()
-    difficulty_buckets: Counter = Counter()
-    lowest_confidence_rows: List[Dict[str, Any]] = []
-
-    logger.info("Loaded %s rows from %s", len(records), input_path)
+    summary = {
+        "total": 0,
+        "valid_count": 0,
+        "needs_review_count": 0,
+        "failed_count": 0,
+        "issue_counter": Counter(),
+        "proposed_counter": Counter(),
+        "confidence_counter": Counter(),
+        "difficulty_counter": Counter(),
+        "domain_counter": Counter(),
+        "algorithm_counter": Counter(),
+        "pattern_counter": Counter(),
+        "micro_skill_counter": Counter(),
+        "suspicious_requires": [],
+        "weak_failure_models": [],
+        "outside_taxonomy": [],
+        "needs_review_examples": [],
+    }
 
     to_process = []
     for index, record in enumerate(records):
@@ -844,167 +1879,101 @@ def main() -> int:
             continue
         raw, previous_metadata = unwrap_raw_and_metadata(record)
         problem_id = infer_problem_id(raw, fallback=f"row_{index}")
+        if args.debug_problem_id and str(problem_id) != str(args.debug_problem_id):
+            continue
         if not args.force and problem_id in existing_ids:
             continue
         to_process.append((problem_id, raw, previous_metadata))
-        
     if args.limit is not None:
-        to_process = to_process[:args.limit]
+        to_process = to_process[: args.limit]
 
-    def _update_stats(metadata: Dict[str, Any], issues: List[str], problem_id: str):
-        nonlocal valid_count, needs_review_count, proposed_counter, domain_counter, algorithm_counter, pattern_counter, difficulty_buckets, lowest_confidence_rows, issue_counter
+    if args.dry_run and not args.write_dry_run:
+        logger.info("Dry run enabled; no output files will be written.")
 
-        status = status_from_issues(issues)
-        if metadata.get("proposed_new_labels"):
-            if any(metadata["proposed_new_labels"].values()):
-                proposed_counter.update(
-                    label
-                    for labels in metadata["proposed_new_labels"].values()
-                    for label in labels
-                )
-
-        if status == "valid":
-            valid_count += 1
-        elif status == "needs_review":
-            needs_review_count += 1
-
-        for label, weight in metadata.get("taxonomy", {}).get("domains", {}).items():
-            domain_counter[label] += 1
-        for label, weight in metadata.get("taxonomy", {}).get("algorithms", {}).items():
-            algorithm_counter[label] += 1
-        for label, weight in metadata.get("taxonomy", {}).get("patterns", {}).items():
-            pattern_counter[label] += 1
-
-        diff = metadata.get("difficulty_vector", {})
-        overall = float(diff.get("overall", 0.0) or 0.0) if isinstance(diff, dict) else 0.0
-        difficulty_buckets[bucket_difficulty(overall)] += 1
-
-        confidence = float(metadata.get("metadata_confidence", 0.0) or 0.0)
-        lowest_confidence_rows.append(
-            {
-                "problem_id": problem_id,
-                "confidence": confidence,
-                "status": status,
-                "issues": issues[:10],
-            }
-        )
-        issue_counter.update(issues)
-        
-    def process_chunk(chunk: List[Tuple[str, Dict[str, Any], Dict[str, Any]]]) -> None:
-        nonlocal total, valid_count, needs_review_count, failed_count
-        if not chunk:
-            return
-            
-        batch_ids = [pid for pid, _, _ in chunk]
-        
-        if len(chunk) > 1:
-            raw_list = [(raw, previous_metadata) for _, raw, previous_metadata in chunk]
-            results_out, issues_out, response_raw, error = enrich_batch(
-                raw_list,
-                taxonomy=taxonomy,
-                mapping=mapping,
+    for problem_id, raw, previous_metadata in to_process:
+        row = {"problem_id": problem_id, "raw": raw, "pass1_metadata": previous_metadata}
+        try:
+            metadata, validation, issues, raw_response, error = process_row(
+                raw,
+                previous_metadata,
+                active_taxonomy=active_taxonomy,
+                master_taxonomy=master_taxonomy,
+                label_mapping=label_mapping,
+                topic_hierarchy=topic_hierarchy,
                 model=args.model,
                 ollama_url=args.ollama_url,
-                timeout=args.timeout * len(chunk),
+                timeout=args.timeout,
                 retries=args.retries,
                 temperature=args.temperature,
                 sleep_between_requests=args.sleep_between_requests,
+                dry_run=args.dry_run,
+                write_dry_run=args.write_dry_run,
+                debug=bool(args.debug_problem_id),
             )
-            
-            missing_ids = [pid for pid in batch_ids if pid not in results_out]
-            if error or missing_ids:
-                logger.warning("Batch processing failed or returned incomplete results for %s items. Reducing batch size and retrying.", len(chunk))
-                mid = max(1, len(chunk) // 2)
-                process_chunk(chunk[:mid])
-                process_chunk(chunk[mid:])
+
+            if args.dry_run and not args.write_dry_run:
+                continue
+
+            if metadata is None or validation is None:
+                summary["failed_count"] += 1
+                failure_row = {
+                    "problem_id": problem_id,
+                    "raw": raw,
+                    "pass1_metadata": previous_metadata,
+                    "error": error or "unable_to_repair",
+                    "raw_response": raw_response,
+                    "validation_issues": issues,
+                }
+                append_jsonl(failures_path, [failure_row])
+                continue
+
+            status = validation["status"]
+            final_row = {"problem_id": problem_id, "raw": raw, "metadata": metadata, "validation": validation}
+            update_summary(summary, metadata, issues, row)
+            if status == "valid":
+                append_jsonl(output_path, [final_row])
+            elif status == "needs_review":
+                append_jsonl(output_path, [final_row])
+                append_jsonl(review_path, [final_row])
             else:
-                total += len(chunk)
-                for problem_id, raw, previous_metadata in chunk:
-                    metadata = results_out[problem_id]
-                    parse_issues = issues_out.get(problem_id, [])
-                    _update_stats(metadata, parse_issues, problem_id)
-                    status = status_from_issues(parse_issues)
+                summary["failed_count"] += 1
+                append_jsonl(failures_path, [{
+                    "problem_id": problem_id,
+                    "raw": raw,
+                    "pass1_metadata": previous_metadata,
+                    "error": error or "validation_failed",
+                    "raw_response": raw_response,
+                    "validation_issues": issues,
+                }])
 
-                    append_jsonl(output_path, [{"problem_id": problem_id, "raw": raw, "metadata": metadata, "validation": {"status": status, "issues": parse_issues}}])
-                    if status != "valid":
-                        append_jsonl(failures_path, [{"problem_id": problem_id, "raw": raw, "error": None, "issues": parse_issues, "raw_response": response_raw, "validation_status": status}])
-        else:
-            problem_id, raw, previous_metadata = chunk[0]
-            total += 1
-            try:
-                metadata, response_raw, s_error, parse_issues = enrich_row(
-                    raw,
-                    previous_metadata,
-                    taxonomy=taxonomy,
-                    mapping=mapping,
-                    model=args.model,
-                    ollama_url=args.ollama_url,
-                    timeout=args.timeout,
-                    retries=args.retries,
-                    temperature=args.temperature,
-                    sleep_between_requests=args.sleep_between_requests,
-                )
-                if metadata is None:
-                    failed_count += 1
-                    issues = parse_issues if parse_issues else [s_error or "unknown_error"]
-                    append_jsonl(failures_path, [{"problem_id": problem_id, "raw": raw, "error": s_error, "issues": issues, "raw_response": response_raw}])
-                    append_jsonl(output_path, [{"problem_id": problem_id, "raw": raw, "metadata": None, "validation": {"status": "failed", "issues": issues}}])
-                    return
-                    
-                _update_stats(metadata, parse_issues, problem_id)
-                status = status_from_issues(parse_issues)
+            logger.info("Processed %s status=%s issues=%s", problem_id, status, issues[:6])
+            if args.debug_problem_id:
+                logger.info("LLM response for %s:\n%s", problem_id, raw_response or "")
+                logger.info("Validation for %s:\n%s", problem_id, json.dumps(validation, ensure_ascii=False, indent=2))
+        except Exception as exc:
+            summary["failed_count"] += 1
+            logger.exception("Unexpected error while processing %s", problem_id)
+            append_jsonl(failures_path, [{
+                "problem_id": problem_id,
+                "raw": raw,
+                "pass1_metadata": previous_metadata,
+                "error": str(exc),
+                "raw_response": None,
+                "validation_issues": [str(exc)],
+            }])
 
-                append_jsonl(output_path, [{"problem_id": problem_id, "raw": raw, "metadata": metadata, "validation": {"status": status, "issues": parse_issues}}])
-                if status != "valid":
-                    append_jsonl(failures_path, [{"problem_id": problem_id, "raw": raw, "error": None, "issues": parse_issues, "raw_response": response_raw, "validation_status": status}])
-            except Exception as exc:
-                failed_count += 1
-                logger.exception("Unexpected error while processing %s", problem_id)
-                issue_counter.update([str(exc)])
-                append_jsonl(failures_path, [{"problem_id": problem_id, "raw": raw, "error": str(exc), "issues": [str(exc)], "raw_response": None}])
-                append_jsonl(output_path, [{"problem_id": problem_id, "raw": raw, "metadata": None, "validation": {"status": "failed", "issues": [str(exc)]}}])
-
-    # Process in batches concurrently
-    batch_size = args.batch_size
-    batches = []
-    for i in range(0, len(to_process), batch_size):
-        batches.append(to_process[i:i+batch_size])
-        
-    with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
-        futures = {executor.submit(process_chunk, batch): batch for batch in batches}
-        for future in as_completed(futures):
-            batch = futures[future]
-            batch_ids = [pid for pid, _, _ in batch]
-            logger.info("Completed threads for batch: %s (%s/%s)", batch_ids, min(total, len(to_process)), args.limit if args.limit is not None else "all")
-            try:
-                future.result()
-            except Exception as exc:
-                logger.exception("Thread execution failed for batch %s: %s", batch_ids, exc)
-
-    lowest_confidence_rows = sorted(lowest_confidence_rows, key=lambda item: item["confidence"])[:50]
-    report = build_report(
-        total=total,
-        valid_count=valid_count,
-        needs_review_count=needs_review_count,
-        failed_count=failed_count,
-        proposed_counter=proposed_counter,
-        issue_counter=issue_counter,
-        lowest_confidence_rows=lowest_confidence_rows,
-        domain_counter=domain_counter,
-        algorithm_counter=algorithm_counter,
-        pattern_counter=pattern_counter,
-        difficulty_buckets=difficulty_buckets,
-    )
-    report_path.write_text(report, encoding="utf-8")
+    if not (args.dry_run and not args.write_dry_run):
+        report = build_report(summary)
+        report_path.write_text(report, encoding="utf-8")
+        logger.info("Wrote report to %s", report_path)
 
     logger.info(
         "Finished. total=%s valid=%s needs_review=%s failed=%s",
-        total,
-        valid_count,
-        needs_review_count,
-        failed_count,
+        summary["total"],
+        summary["valid_count"],
+        summary["needs_review_count"],
+        summary["failed_count"],
     )
-    logger.info("Wrote report to %s", report_path)
     return 0
 
 

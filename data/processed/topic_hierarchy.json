@@ -1,0 +1,809 @@
+[
+  {
+    "topic": "dsa_foundations",
+    "description": "Top-level learning map for the recommendation system.",
+    "parent": null,
+    "children": [
+      "arrays_and_strings",
+      "linked_structures",
+      "trees_and_heaps",
+      "graphs_and_search",
+      "searching_sorting_ranges",
+      "intervals_and_ranges",
+      "dynamic_programming_and_backtracking",
+      "math_bit_sql_design"
+    ],
+    "contains_domains": [
+      "data_structure",
+      "array",
+      "string",
+      "linked_list",
+      "stack_queue",
+      "hash_table",
+      "tree",
+      "binary_tree",
+      "binary_search_tree",
+      "graph",
+      "matrix",
+      "interval",
+      "heap",
+      "trie",
+      "math",
+      "bit_manipulation",
+      "combinatorics",
+      "number_theory",
+      "design",
+      "sql",
+      "simulation"
+    ],
+    "contains_algorithms": [
+      "sorting",
+      "binary_search",
+      "two_pointers",
+      "sliding_window_variable",
+      "prefix_sum",
+      "depth_first_search",
+      "breadth_first_search",
+      "topological_sort",
+      "union_find",
+      "dynamic_programming_bottom_up",
+      "backtracking",
+      "heap_priority_queue"
+    ],
+    "contains_patterns": [
+      "two_sum",
+      "subarray_sum",
+      "sliding_window_variable",
+      "tree_level_order",
+      "graph_connected_components",
+      "merge_intervals",
+      "dp_linear_sequence",
+      "backtracking_combinations",
+      "design_lru_cache",
+      "sql_window_function"
+    ],
+    "contains_micro_skills": [
+      "boundary_handling",
+      "index_management",
+      "pointer_update",
+      "state_tracking",
+      "invariant_maintenance",
+      "dp_transition_design",
+      "graph_adjacency_traversal",
+      "heap_usage",
+      "sql_grouping_reasoning"
+    ]
+  },
+  {
+    "topic": "arrays_and_strings",
+    "description": "Array and string mechanics, including windowing and indexing.",
+    "parent": "dsa_foundations",
+    "children": [
+      "pair_and_sum",
+      "sliding_window_strings",
+      "string_algorithms",
+      "prefix_suffix_variants"
+    ],
+    "contains_domains": [
+      "array",
+      "string",
+      "matrix",
+      "hash_table",
+      "interval"
+    ],
+    "contains_algorithms": [
+      "sorting",
+      "two_pointers",
+      "sliding_window_variable",
+      "prefix_sum",
+      "hash_map_lookup",
+      "matrix_traversal",
+      "binary_search",
+      "kmp_string_matching",
+      "rolling_hash_string_matching",
+      "manacher_palindrome_radius"
+    ],
+    "contains_patterns": [
+      "two_sum",
+      "subarray_sum",
+      "longest_substring_without_repeating",
+      "minimum_window_substring",
+      "matrix_spiral_traversal",
+      "palindrome_check",
+      "three_sum",
+      "anagram_detection",
+      "string_matching",
+      "palindrome_manacher",
+      "rolling_hash_search",
+      "prefix_suffix_combination"
+    ],
+    "contains_micro_skills": [
+      "index_management",
+      "string_indexing",
+      "prefix_sum_construction",
+      "two_pointer_coordination",
+      "window_shrink_expand",
+      "failure_function_construction",
+      "palindrome_radius_expansion",
+      "rolling_hash_collision_control"
+    ]
+  },
+  {
+    "topic": "linked_structures",
+    "description": "Linked lists, stacks, queues, and pointer-heavy state.",
+    "parent": "dsa_foundations",
+    "children": [
+      "linked_list_pointer_work",
+      "design_and_state"
+    ],
+    "contains_domains": [
+      "linked_list",
+      "stack_queue",
+      "hash_table",
+      "design"
+    ],
+    "contains_algorithms": [
+      "depth_first_search",
+      "breadth_first_search",
+      "hash_map_lookup",
+      "linked_list_manipulation",
+      "deque",
+      "lru_cache",
+      "lfu_cache",
+      "min_stack",
+      "max_stack"
+    ],
+    "contains_patterns": [
+      "linked_list_reversal",
+      "linked_list_cycle",
+      "fast_slow_pointer",
+      "valid_parentheses",
+      "cache_design",
+      "deque_window_processing"
+    ],
+    "contains_micro_skills": [
+      "pointer_update",
+      "linked_list_pointer_update",
+      "stack_usage",
+      "queue_usage",
+      "sentinel_dummy_node",
+      "cache_eviction_policy",
+      "deque_window_management"
+    ]
+  },
+  {
+    "topic": "trees_and_heaps",
+    "description": "Tree traversal, BST reasoning, and heap-based selection.",
+    "parent": "dsa_foundations",
+    "children": [
+      "tree_traversal_and_construction",
+      "heap_and_priority_queue",
+      "trie_and_prefix"
+    ],
+    "contains_domains": [
+      "tree",
+      "binary_tree",
+      "binary_search_tree",
+      "heap",
+      "trie"
+    ],
+    "contains_algorithms": [
+      "tree_traversal",
+      "breadth_first_search",
+      "depth_first_search",
+      "heap_priority_queue",
+      "trie_search",
+      "median_of_data_stream",
+      "ordered_set"
+    ],
+    "contains_patterns": [
+      "tree_level_order",
+      "tree_dfs",
+      "bst_validation",
+      "lowest_common_ancestor",
+      "tree_construction",
+      "heap_top_k",
+      "trie_prefix_search",
+      "data_stream_median"
+    ],
+    "contains_micro_skills": [
+      "tree_node_access",
+      "heap_usage",
+      "queue_usage",
+      "recursion_depth_control",
+      "heap_rebalancing",
+      "order_statistic_querying"
+    ]
+  },
+  {
+    "topic": "graphs_and_search",
+    "description": "Connectivity, traversal, ordering, and shortest-path problems.",
+    "parent": "dsa_foundations",
+    "children": [
+      "graph_connectivity_and_paths",
+      "advanced_graph_algorithms"
+    ],
+    "contains_domains": [
+      "graph",
+      "disjoint_set",
+      "probability",
+      "randomized"
+    ],
+    "contains_algorithms": [
+      "depth_first_search",
+      "breadth_first_search",
+      "topological_sort",
+      "union_find",
+      "shortest_path",
+      "dijkstra_shortest_path",
+      "bellman_ford_shortest_path",
+      "floyd_warshall_all_pairs_shortest_path",
+      "tarjan_scc",
+      "kosaraju_scc",
+      "eulerian_path"
+    ],
+    "contains_patterns": [
+      "graph_connected_components",
+      "shortest_path",
+      "topological_ordering",
+      "graph_union_find_components",
+      "strongly_connected_components",
+      "eulerian_path_construction"
+    ],
+    "contains_micro_skills": [
+      "graph_adjacency_traversal",
+      "visited_marking",
+      "topological_indegree_tracking",
+      "graph_cycle_detection",
+      "graph_weight_handling",
+      "edge_relaxation",
+      "scc_lowlink_reasoning",
+      "eulerian_edge_traversal_tracking"
+    ]
+  },
+  {
+    "topic": "searching_sorting_ranges",
+    "description": "Binary search, ordering, partitions, and range reasoning.",
+    "parent": "dsa_foundations",
+    "children": [
+      "binary_search_patterns",
+      "interval_scheduling_and_merging",
+      "sorting_and_order_statistics",
+      "geometry_and_line_sweep"
+    ],
+    "contains_domains": [
+      "array",
+      "interval",
+      "math",
+      "ordered_map",
+      "segment_tree",
+      "binary_indexed_tree",
+      "ordered_set"
+    ],
+    "contains_algorithms": [
+      "binary_search",
+      "binary_search_on_answer",
+      "sorting",
+      "ordered_map",
+      "quickselect",
+      "merge_sort",
+      "counting_sort",
+      "bucket_sort",
+      "line_sweep",
+      "kadane_algorithm"
+    ],
+    "contains_patterns": [
+      "merge_intervals",
+      "meeting_rooms",
+      "cyclic_sort",
+      "buy_and_sell_stock",
+      "jump_game",
+      "longest_consecutive_sequence",
+      "binary_search_rotated_array",
+      "sorting_and_order_statistics",
+      "line_sweep_intervals",
+      "kadane_max_subarray"
+    ],
+    "contains_micro_skills": [
+      "binary_search_bounds",
+      "ordering_constraints",
+      "partitioning_logic",
+      "duplicate_handling",
+      "boundary_handling",
+      "index_management",
+      "line_sweep_event_sorting",
+      "bucket_bound_assignment"
+    ]
+  },
+  {
+    "topic": "dynamic_programming_and_backtracking",
+    "description": "State recurrence, memoization, and exhaustive search with pruning.",
+    "parent": "dsa_foundations",
+    "children": [
+      "dynamic_programming_core",
+      "backtracking_and_combinatorics",
+      "state_compression_dp"
+    ],
+    "contains_domains": [
+      "combinatorics",
+      "number_theory",
+      "design",
+      "simulation",
+      "bit_manipulation",
+      "matrix"
+    ],
+    "contains_algorithms": [
+      "dynamic_programming_top_down",
+      "dynamic_programming_bottom_up",
+      "memoization",
+      "backtracking",
+      "greedy_choice",
+      "bitmask_dp",
+      "digit_dp",
+      "matrix_exponentiation",
+      "zero_one_bfs"
+    ],
+    "contains_patterns": [
+      "dp_linear_sequence",
+      "dp_grid",
+      "dp_interval",
+      "backtracking_combinations",
+      "word_break",
+      "combination_sum",
+      "subset_sum",
+      "n_queen",
+      "sudoku_validation",
+      "bitmask_dp",
+      "matrix_exponentiation_dp"
+    ],
+    "contains_micro_skills": [
+      "dp_transition_design",
+      "memoization_table_design",
+      "pruning",
+      "state_reset",
+      "base_case_selection",
+      "tabulation_ordering",
+      "state_encoding",
+      "subset_enumeration",
+      "modular_arithmetic_guarding"
+    ]
+  },
+  {
+    "topic": "math_bit_sql_design",
+    "description": "Math, bit tricks, SQL, and stateful design problems.",
+    "parent": "dsa_foundations",
+    "children": [
+      "advanced_number_theory_and_math",
+      "bit_manipulation_patterns",
+      "sql_patterns",
+      "streaming_and_cache_design"
+    ],
+    "contains_domains": [
+      "math",
+      "bit_manipulation",
+      "number_theory",
+      "sql",
+      "design",
+      "simulation",
+      "geometry",
+      "probability",
+      "randomized"
+    ],
+    "contains_algorithms": [
+      "bit_manipulation",
+      "state_machine",
+      "simulation",
+      "ordered_map",
+      "sieve_of_eratosthenes",
+      "prime_factorization",
+      "convex_hull",
+      "median_of_data_stream",
+      "lru_cache",
+      "lfu_cache"
+    ],
+    "contains_patterns": [
+      "design_lru_cache",
+      "design_median_finder",
+      "sql_group_by",
+      "sql_window_function",
+      "trapping_rain_water",
+      "advanced_bit_tricks",
+      "prime_sieve_factorization",
+      "convex_hull_geometry",
+      "cache_design",
+      "data_stream_median"
+    ],
+    "contains_micro_skills": [
+      "bitmask_operations",
+      "sql_grouping_reasoning",
+      "overflow_guarding",
+      "null_handling",
+      "sieve_marking",
+      "prime_factor_extraction",
+      "cross_product_orientation",
+      "cache_eviction_policy"
+    ]
+  },
+  {
+    "topic": "pair_and_sum",
+    "description": "Problems that rely on fixed-size or complement-based pairing.",
+    "parent": "dsa_foundations > arrays_and_strings",
+    "children": [],
+    "contains_domains": [
+      "array",
+      "hash_table"
+    ],
+    "contains_algorithms": [
+      "two_pointers",
+      "hash_map_lookup"
+    ],
+    "contains_patterns": [
+      "two_sum",
+      "subarray_sum"
+    ],
+    "contains_micro_skills": [
+      "index_management",
+      "hash_map_usage"
+    ]
+  },
+  {
+    "topic": "sliding_window_strings",
+    "description": "String windows, anagrams, and substring constraints.",
+    "parent": "dsa_foundations > arrays_and_strings",
+    "children": [],
+    "contains_domains": [
+      "string",
+      "hash_table"
+    ],
+    "contains_algorithms": [
+      "sliding_window_variable",
+      "prefix_sum"
+    ],
+    "contains_patterns": [
+      "longest_substring_without_repeating",
+      "minimum_window_substring",
+      "anagram_detection"
+    ],
+    "contains_micro_skills": [
+      "window_shrink_expand",
+      "character_frequency_count"
+    ]
+  },
+  {
+    "topic": "string_algorithms",
+    "description": "Pattern matching, palindromes, and suffix structures.",
+    "parent": "dsa_foundations > arrays_and_strings",
+    "children": [],
+    "contains_domains": [
+      "string"
+    ],
+    "contains_algorithms": [
+      "kmp_string_matching",
+      "z_algorithm_string_matching",
+      "manacher_palindrome_radius",
+      "rolling_hash_string_matching"
+    ],
+    "contains_patterns": [
+      "string_matching",
+      "palindrome_manacher",
+      "rolling_hash_search"
+    ],
+    "contains_micro_skills": [
+      "failure_function_construction",
+      "palindrome_radius_expansion",
+      "rolling_hash_collision_control"
+    ]
+  },
+  {
+    "topic": "prefix_suffix_variants",
+    "description": "Prefix and suffix accumulation or combination problems.",
+    "parent": "dsa_foundations > arrays_and_strings",
+    "children": [],
+    "contains_domains": [
+      "array",
+      "string"
+    ],
+    "contains_algorithms": [
+      "prefix_sum",
+      "kadane_algorithm"
+    ],
+    "contains_patterns": [
+      "prefix_suffix_combination",
+      "kadane_max_subarray"
+    ],
+    "contains_micro_skills": [
+      "prefix_sum_construction",
+      "kadane_running_max_tracking"
+    ]
+  },
+  {
+    "topic": "graph_connectivity_and_paths",
+    "description": "Connectivity, traversal, and shortest path problems.",
+    "parent": "dsa_foundations > graphs_and_search",
+    "children": [],
+    "contains_domains": [
+      "graph",
+      "disjoint_set"
+    ],
+    "contains_algorithms": [
+      "breadth_first_search",
+      "depth_first_search",
+      "union_find",
+      "dijkstra_shortest_path",
+      "bellman_ford_shortest_path"
+    ],
+    "contains_patterns": [
+      "graph_connected_components",
+      "shortest_path",
+      "graph_union_find_components"
+    ],
+    "contains_micro_skills": [
+      "graph_adjacency_traversal",
+      "visited_marking",
+      "edge_relaxation"
+    ]
+  },
+  {
+    "topic": "advanced_graph_algorithms",
+    "description": "SCC, Eulerian, and advanced directed-graph families.",
+    "parent": "dsa_foundations > graphs_and_search",
+    "children": [],
+    "contains_domains": [
+      "graph"
+    ],
+    "contains_algorithms": [
+      "tarjan_scc",
+      "kosaraju_scc",
+      "eulerian_path",
+      "floyd_warshall_all_pairs_shortest_path"
+    ],
+    "contains_patterns": [
+      "strongly_connected_components",
+      "eulerian_path_construction"
+    ],
+    "contains_micro_skills": [
+      "scc_lowlink_reasoning",
+      "eulerian_edge_traversal_tracking"
+    ]
+  },
+  {
+    "topic": "binary_search_patterns",
+    "description": "Classic and answer-space binary search variants.",
+    "parent": "dsa_foundations > searching_sorting_ranges",
+    "children": [],
+    "contains_domains": [
+      "array",
+      "matrix",
+      "interval"
+    ],
+    "contains_algorithms": [
+      "binary_search",
+      "binary_search_on_answer"
+    ],
+    "contains_patterns": [
+      "binary_search_rotated_array"
+    ],
+    "contains_micro_skills": [
+      "binary_search_bounds",
+      "boundary_handling"
+    ]
+  },
+  {
+    "topic": "interval_scheduling_and_merging",
+    "description": "Merging, scheduling, and overlap reasoning.",
+    "parent": "dsa_foundations > searching_sorting_ranges",
+    "children": [],
+    "contains_domains": [
+      "interval"
+    ],
+    "contains_algorithms": [
+      "merge_intervals",
+      "line_sweep"
+    ],
+    "contains_patterns": [
+      "merge_intervals",
+      "meeting_rooms",
+      "line_sweep_intervals"
+    ],
+    "contains_micro_skills": [
+      "boundary_handling",
+      "line_sweep_event_sorting"
+    ]
+  },
+  {
+    "topic": "sorting_and_order_statistics",
+    "description": "Sorting, ranking, and selection families.",
+    "parent": "dsa_foundations > searching_sorting_ranges",
+    "children": [],
+    "contains_domains": [
+      "array",
+      "ordered_set"
+    ],
+    "contains_algorithms": [
+      "merge_sort",
+      "counting_sort",
+      "bucket_sort",
+      "ordered_set"
+    ],
+    "contains_patterns": [
+      "sorting_and_order_statistics"
+    ],
+    "contains_micro_skills": [
+      "bucket_bound_assignment",
+      "order_statistic_querying"
+    ]
+  },
+  {
+    "topic": "geometry_and_line_sweep",
+    "description": "Sweep-line and computational geometry families.",
+    "parent": "dsa_foundations > searching_sorting_ranges",
+    "children": [],
+    "contains_domains": [
+      "geometry",
+      "interval"
+    ],
+    "contains_algorithms": [
+      "line_sweep",
+      "convex_hull"
+    ],
+    "contains_patterns": [
+      "line_sweep_intervals",
+      "convex_hull_geometry"
+    ],
+    "contains_micro_skills": [
+      "line_sweep_event_sorting",
+      "cross_product_orientation"
+    ]
+  },
+  {
+    "topic": "dynamic_programming_core",
+    "description": "State transitions, memoization, and tabulation.",
+    "parent": "dsa_foundations > dynamic_programming_and_backtracking",
+    "children": [],
+    "contains_domains": [
+      "array",
+      "matrix"
+    ],
+    "contains_algorithms": [
+      "dynamic_programming_top_down",
+      "dynamic_programming_bottom_up"
+    ],
+    "contains_patterns": [
+      "dp_linear_sequence",
+      "dp_grid",
+      "dp_interval"
+    ],
+    "contains_micro_skills": [
+      "dp_transition_design",
+      "memoization_table_design"
+    ]
+  },
+  {
+    "topic": "backtracking_and_combinatorics",
+    "description": "Search, prune, and enumerate combinations and placements.",
+    "parent": "dsa_foundations > dynamic_programming_and_backtracking",
+    "children": [],
+    "contains_domains": [
+      "combinatorics"
+    ],
+    "contains_algorithms": [
+      "backtracking"
+    ],
+    "contains_patterns": [
+      "backtracking_combinations"
+    ],
+    "contains_micro_skills": [
+      "pruning",
+      "duplicate_handling"
+    ]
+  },
+  {
+    "topic": "state_compression_dp",
+    "description": "Bitmask and compact-state dynamic programming.",
+    "parent": "dsa_foundations > dynamic_programming_and_backtracking",
+    "children": [],
+    "contains_domains": [
+      "bit_manipulation"
+    ],
+    "contains_algorithms": [
+      "bitmask_dp"
+    ],
+    "contains_patterns": [
+      "bitmask_dp"
+    ],
+    "contains_micro_skills": [
+      "state_encoding",
+      "bitmask_operations"
+    ]
+  },
+  {
+    "topic": "advanced_number_theory_and_math",
+    "description": "Primes, modular arithmetic, and recurrence acceleration.",
+    "parent": "dsa_foundations > math_bit_sql_design",
+    "children": [],
+    "contains_domains": [
+      "math",
+      "number_theory"
+    ],
+    "contains_algorithms": [
+      "sieve_of_eratosthenes",
+      "prime_factorization",
+      "matrix_exponentiation"
+    ],
+    "contains_patterns": [
+      "prime_sieve_factorization",
+      "matrix_exponentiation_dp"
+    ],
+    "contains_micro_skills": [
+      "sieve_marking",
+      "modular_arithmetic_guarding"
+    ]
+  },
+  {
+    "topic": "bit_manipulation_patterns",
+    "description": "Bitwise masks, subsets, and binary reasoning.",
+    "parent": "dsa_foundations > math_bit_sql_design",
+    "children": [],
+    "contains_domains": [
+      "bit_manipulation"
+    ],
+    "contains_algorithms": [
+      "bit_manipulation",
+      "bitmask_dp"
+    ],
+    "contains_patterns": [
+      "advanced_bit_tricks"
+    ],
+    "contains_micro_skills": [
+      "bitmask_operations",
+      "state_encoding"
+    ]
+  },
+  {
+    "topic": "sql_patterns",
+    "description": "Group-by and window-function query reasoning.",
+    "parent": "dsa_foundations > math_bit_sql_design",
+    "children": [],
+    "contains_domains": [
+      "sql"
+    ],
+    "contains_algorithms": [
+      "sql_group_by",
+      "sql_window_function"
+    ],
+    "contains_patterns": [
+      "sql_group_by",
+      "sql_window_function"
+    ],
+    "contains_micro_skills": [
+      "sql_grouping_reasoning"
+    ]
+  },
+  {
+    "topic": "streaming_and_cache_design",
+    "description": "Online maintenance, eviction, and bounded-memory design.",
+    "parent": "dsa_foundations > math_bit_sql_design",
+    "children": [],
+    "contains_domains": [
+      "design",
+      "stack_queue"
+    ],
+    "contains_algorithms": [
+      "lru_cache",
+      "lfu_cache",
+      "median_of_data_stream",
+      "deque",
+      "monotonic_queue"
+    ],
+    "contains_patterns": [
+      "cache_design",
+      "data_stream_median",
+      "deque_window_processing"
+    ],
+    "contains_micro_skills": [
+      "cache_eviction_policy",
+      "heap_rebalancing",
+      "deque_window_management"
+    ]
+  }
+]
