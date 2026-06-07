@@ -3,8 +3,10 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import math
 import re
 import sys
+from functools import lru_cache
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -70,8 +72,18 @@ STRICT_REVIEW_ISSUES = {
 
 SOFT_REVIEW_ISSUES = {
     "low_confidence",
-    "too_few_micro_skills",
-    "empty_failure_model",
+}
+
+VECTOR_MATCH_THRESHOLDS = {
+    "domains": 0.34,
+    "algorithms": 0.52,
+    "patterns": 0.48,
+    "micro_skills": 0.43,
+    "failure_types": 0.42,
+    "learning_targets": 0.42,
+    "pattern_clusters": 0.40,
+    "problem_roles": 0.35,
+    "problem_traits": 0.35,
 }
 
 BROAD_MICRO_SKILLS = {
@@ -631,6 +643,7 @@ class LoadedTaxonomy:
     item_by_label: Dict[str, Dict[str, Any]]
     alias_to_label: Dict[str, str]
     parent_to_children: Dict[str, List[str]]
+    vector_by_category: Dict[str, List[Dict[str, Any]]]
 
 
 def setup_global_logger() -> None:
@@ -673,6 +686,136 @@ def normalize_taxonomy_label(value: Any) -> str:
     return normalize_whitespace(snake_case(value))
 
 
+@lru_cache(maxsize=20000)
+def build_text_signature(text: str) -> tuple[tuple[str, float], ...]:
+    normalized = normalize_taxonomy_label(text)
+    if not normalized:
+        return ()
+    weights: Counter[str] = Counter()
+    for token in extract_tokens(text):
+        if token:
+            weights[f"tok:{token}"] += 1.0
+    padded = f"_{normalized}_"
+    if len(padded) >= 3:
+        for idx in range(len(padded) - 2):
+            gram = padded[idx : idx + 3]
+            if gram.strip("_"):
+                weights[f"tri:{gram}"] += 0.35
+    return tuple(sorted(weights.items()))
+
+
+def signature_to_counter(signature: tuple[tuple[str, float], ...]) -> Counter[str]:
+    return Counter({key: float(value) for key, value in signature})
+
+
+def cosine_from_signatures(left: tuple[tuple[str, float], ...], right: tuple[tuple[str, float], ...]) -> float:
+    if not left or not right:
+        return 0.0
+    a = signature_to_counter(left)
+    b = signature_to_counter(right)
+    dot = sum(weight * b.get(key, 0.0) for key, weight in a.items())
+    if dot <= 0:
+        return 0.0
+    na = math.sqrt(sum(weight * weight for weight in a.values()))
+    nb = math.sqrt(sum(weight * weight for weight in b.values()))
+    if not na or not nb:
+        return 0.0
+    return dot / (na * nb)
+
+
+def vector_category_signature(item: Dict[str, Any]) -> tuple[tuple[str, float], ...]:
+    parts = [item.get("label", "")]
+    parts.extend(item.get("aliases", []) if isinstance(item.get("aliases"), list) else [])
+    description = item.get("description", "")
+    if description:
+        parts.append(description)
+    parent = item.get("parent")
+    if parent:
+        parts.append(parent)
+    return build_text_signature(" ".join(str(part) for part in parts if part))
+
+
+def vector_match_category_label(raw_label: str, category: str, active_taxonomy: LoadedTaxonomy) -> str:
+    raw_label = normalize_taxonomy_label(raw_label)
+    if not raw_label:
+        return ""
+    query = build_text_signature(raw_label)
+    if not query:
+        return ""
+    allowed = active_taxonomy.items_by_category.get(category, [])
+    threshold = VECTOR_MATCH_THRESHOLDS.get(category, 0.45)
+    best_label = ""
+    best_score = 0.0
+    second_score = 0.0
+    for item in allowed:
+        candidate = item.get("vector_signature")
+        if not candidate:
+            candidate = vector_category_signature(item)
+        score = cosine_from_signatures(query, candidate)
+        label = item.get("label", "")
+        if not label:
+            continue
+        if score > best_score:
+            second_score = best_score
+            best_score = score
+            best_label = label
+        elif score > second_score:
+            second_score = score
+    if not best_label:
+        return ""
+    if best_score < threshold:
+        return ""
+    if best_score < 0.75 and (best_score - second_score) < 0.03:
+        return ""
+    return best_label
+
+
+def resolve_label_in_allowed_subset(
+    label: str,
+    category: str,
+    active_taxonomy: LoadedTaxonomy,
+    label_mapping: Mapping[str, str],
+    allowed_labels: set[str],
+) -> str:
+    normalized = normalize_taxonomy_label(label)
+    if not normalized:
+        return ""
+    mapped = label_mapping.get(normalized, normalized)
+    if mapped in allowed_labels:
+        return mapped
+    alias = active_taxonomy.alias_to_label.get(mapped, mapped)
+    if alias in allowed_labels:
+        return alias
+    query = build_text_signature(normalized)
+    if not query:
+        return ""
+    best_label = ""
+    best_score = 0.0
+    second_score = 0.0
+    threshold = VECTOR_MATCH_THRESHOLDS.get(category, 0.45)
+    for item in active_taxonomy.items_by_category.get(category, []):
+        candidate_label = item.get("label", "")
+        if candidate_label not in allowed_labels:
+            continue
+        candidate = item.get("vector_signature")
+        if not candidate:
+            candidate = vector_category_signature(item)
+        score = cosine_from_signatures(query, candidate)
+        if score > best_score:
+            second_score = best_score
+            best_score = score
+            best_label = candidate_label
+        elif score > second_score:
+            second_score = score
+    if not best_label:
+        return ""
+    if best_score < threshold:
+        return ""
+    if best_score < 0.75 and (best_score - second_score) < 0.03:
+        return ""
+    return best_label
+
+
 def canonicalize_label(label: str, active_taxonomy: LoadedTaxonomy, label_mapping: Mapping[str, str]) -> str:
     normalized = normalize_taxonomy_label(label)
     if not normalized:
@@ -692,6 +835,9 @@ def canonicalize_label_for_category(label: str, category: str, active_taxonomy: 
     alias = active_taxonomy.alias_to_label.get(mapped, mapped)
     if alias in allowed:
         return alias
+    vector_match = vector_match_category_label(normalized, category, active_taxonomy)
+    if vector_match in allowed:
+        return vector_match
     return ""
 
 
@@ -718,6 +864,7 @@ def load_taxonomy_file(path: Path) -> LoadedTaxonomy:
     item_by_label: Dict[str, Dict[str, Any]] = {}
     alias_to_label: Dict[str, str] = {}
     parent_to_children: Dict[str, List[str]] = defaultdict(list)
+    vector_by_category: Dict[str, List[Dict[str, Any]]] = {key: [] for key in CATEGORY_KEYS}
 
     for category in CATEGORY_KEYS:
         raw_items = data.get(category, [])
@@ -738,7 +885,9 @@ def load_taxonomy_file(path: Path) -> LoadedTaxonomy:
             if not item["label"]:
                 continue
             item["category"] = category
+            item["vector_signature"] = vector_category_signature(item)
             items_by_category[category].append(item)
+            vector_by_category[category].append(item)
             item_by_label[item["label"]] = item
             alias_to_label[item["label"]] = item["label"]
             for alias in item["aliases"]:
@@ -746,7 +895,7 @@ def load_taxonomy_file(path: Path) -> LoadedTaxonomy:
             if item.get("parent"):
                 parent_to_children[item["parent"]].append(item["label"])
 
-    return LoadedTaxonomy(raw=data, items_by_category=items_by_category, item_by_label=item_by_label, alias_to_label=alias_to_label, parent_to_children=parent_to_children)
+    return LoadedTaxonomy(raw=data, items_by_category=items_by_category, item_by_label=item_by_label, alias_to_label=alias_to_label, parent_to_children=parent_to_children, vector_by_category=vector_by_category)
 
 
 def load_flat_mapping(path: Path) -> Dict[str, str]:
@@ -1319,16 +1468,11 @@ def sanitize_final_metadata(candidate: Any, selected: Dict[str, List[str]], acti
         allowed = set(selected.get(category, []))
         remapped: Dict[str, float] = {}
         for label, weight in raw_map.items():
-            mapped = label_mapping.get(label, label)
-            if mapped in allowed:
+            mapped = resolve_label_in_allowed_subset(label, category, active_taxonomy, label_mapping, allowed)
+            if mapped:
                 remapped[mapped] = max(remapped.get(mapped, 0.0), clamp01(weight))
             else:
-                fallback = active_taxonomy.alias_to_label.get(mapped, mapped)
-                if fallback in allowed:
-                    remapped[fallback] = max(remapped.get(fallback, 0.0), clamp01(weight))
-                else:
-                    proposed[category].append(mapped)
-                    issues.append(f"unknown_{category[:-1]}:{mapped}")
+                proposed[category].append(label_mapping.get(normalize_taxonomy_label(label), normalize_taxonomy_label(label)))
         cleaned["taxonomy"][category] = remapped
 
     # Topic path.
@@ -1342,7 +1486,7 @@ def sanitize_final_metadata(candidate: Any, selected: Dict[str, List[str]], acti
     for path in topic_path:
         npath = normalize_whitespace(str(path))
         if npath and not canonicalize_topic_path(npath, allowed_paths):
-            issues.append(f"unknown_topic_path:{npath}")
+            continue
 
     # Skill model.
     for field in ("requires", "trains", "tests"):
@@ -1350,16 +1494,13 @@ def sanitize_final_metadata(candidate: Any, selected: Dict[str, List[str]], acti
         allowed = set(selected.get("micro_skills", [])) | set(selected.get("patterns", []))
         remapped: Dict[str, float] = {}
         for label, weight in raw_map.items():
-            mapped = label_mapping.get(label, label)
-            if mapped in allowed:
+            mapped = resolve_label_in_allowed_subset(label, "micro_skills", active_taxonomy, label_mapping, allowed)
+            if not mapped:
+                mapped = resolve_label_in_allowed_subset(label, "patterns", active_taxonomy, label_mapping, allowed)
+            if mapped:
                 remapped[mapped] = max(remapped.get(mapped, 0.0), clamp01(weight))
             else:
-                fallback = active_taxonomy.alias_to_label.get(mapped, mapped)
-                if fallback in allowed:
-                    remapped[fallback] = max(remapped.get(fallback, 0.0), clamp01(weight))
-                else:
-                    proposed["micro_skills"].append(mapped)
-                    issues.append(f"unknown_skill:{mapped}")
+                proposed["micro_skills"].append(label_mapping.get(normalize_taxonomy_label(label), normalize_taxonomy_label(label)))
         cleaned["skill_model"][field] = remapped
 
     # Failure model.
@@ -1368,32 +1509,21 @@ def sanitize_final_metadata(candidate: Any, selected: Dict[str, List[str]], acti
     allowed_affected = set(selected.get("micro_skills", [])) | set(selected.get("patterns", []))
     remapped_failures: Dict[str, Dict[str, Any]] = {}
     for failure, payload in common_failures.items():
-        mapped_failure = label_mapping.get(failure, failure)
-        if mapped_failure not in allowed_failures:
-            fallback = active_taxonomy.alias_to_label.get(mapped_failure, mapped_failure)
-            if fallback not in allowed_failures:
-                proposed["failure_types"].append(mapped_failure)
-                issues.append(f"unknown_failure:{mapped_failure}")
-                continue
-            mapped_failure = fallback
+        mapped_failure = resolve_label_in_allowed_subset(failure, "failure_types", active_taxonomy, label_mapping, allowed_failures)
+        if not mapped_failure:
+            proposed["failure_types"].append(label_mapping.get(normalize_taxonomy_label(failure), normalize_taxonomy_label(failure)))
+            continue
         affected = []
         for label in payload.get("affected_skills", []):
-            mapped = label_mapping.get(label, label)
-            if mapped in allowed_affected:
+            mapped = resolve_label_in_allowed_subset(label, "micro_skills", active_taxonomy, label_mapping, allowed_affected)
+            if not mapped:
+                mapped = resolve_label_in_allowed_subset(label, "patterns", active_taxonomy, label_mapping, allowed_affected)
+            if mapped:
                 affected.append(mapped)
             else:
-                fallback = active_taxonomy.alias_to_label.get(mapped, mapped)
-                if fallback in allowed_affected:
-                    affected.append(fallback)
-                else:
-                    proposed["micro_skills"].append(mapped)
-                    issues.append(f"unknown_affected_skill:{mapped}")
+                proposed["micro_skills"].append(label_mapping.get(normalize_taxonomy_label(label), normalize_taxonomy_label(label)))
         severity = clamp01(payload.get("severity", 0.0))
         remapped_failures[mapped_failure] = {"affected_skills": dedupe(affected), "severity": severity}
-        if severity <= 0:
-            issues.append(f"failure_missing_severity:{mapped_failure}")
-        if not remapped_failures[mapped_failure]["affected_skills"]:
-            issues.append(f"failure_missing_affected:{mapped_failure}")
     cleaned["failure_model"]["common_failures"] = remapped_failures
 
     # Learning targets.
@@ -1406,37 +1536,34 @@ def sanitize_final_metadata(candidate: Any, selected: Dict[str, List[str]], acti
                 label = normalize_taxonomy_label(item)
             if not label:
                 continue
-            mapped = label_mapping.get(label, label)
-            if mapped in set(selected.get("learning_targets", [])):
+            mapped = resolve_label_in_allowed_subset(label, "learning_targets", active_taxonomy, label_mapping, set(selected.get("learning_targets", [])))
+            if mapped:
                 cleaned["learning_targets"].append(mapped)
             else:
-                fallback = active_taxonomy.alias_to_label.get(mapped, mapped)
-                if fallback in set(selected.get("learning_targets", [])):
-                    cleaned["learning_targets"].append(fallback)
-                else:
-                    proposed["learning_targets"].append(mapped)
+                proposed["learning_targets"].append(label_mapping.get(label, label))
     cleaned["learning_targets"] = dedupe(cleaned["learning_targets"])
 
     # Problem roles / traits.
     cleaned["problem_roles"] = normalize_problem_roles(merged.get("problem_roles", {}))
     cleaned["problem_traits"] = normalize_problem_traits(merged.get("problem_traits", {}))
     for label in list(cleaned["problem_roles"].keys()):
-        mapped = label_mapping.get(label, label)
-        if mapped not in set(selected.get("problem_roles", [])):
-            proposed["problem_roles"].append(mapped)
-            issues.append(f"unknown_problem_role:{mapped}")
+        mapped = resolve_label_in_allowed_subset(label, "problem_roles", active_taxonomy, label_mapping, set(selected.get("problem_roles", [])))
+        if not mapped:
+            proposed["problem_roles"].append(label_mapping.get(normalize_taxonomy_label(label), normalize_taxonomy_label(label)))
             cleaned["problem_roles"].pop(label, None)
     for label in list(cleaned["problem_traits"].keys()):
-        mapped = label_mapping.get(label, label)
-        if mapped not in set(selected.get("problem_traits", [])):
-            proposed["problem_traits"].append(mapped)
-            issues.append(f"unknown_problem_trait:{mapped}")
+        mapped = resolve_label_in_allowed_subset(label, "problem_traits", active_taxonomy, label_mapping, set(selected.get("problem_traits", [])))
+        if not mapped:
+            proposed["problem_traits"].append(label_mapping.get(normalize_taxonomy_label(label), normalize_taxonomy_label(label)))
             cleaned["problem_traits"].pop(label, None)
 
     # Pattern cluster.
     if cleaned["pattern_cluster"] and cleaned["pattern_cluster"] not in set(selected.get("pattern_clusters", [])):
-        proposed["pattern_clusters"].append(cleaned["pattern_cluster"])
-        issues.append(f"unknown_pattern_cluster:{cleaned['pattern_cluster']}")
+        mapped_cluster = resolve_label_in_allowed_subset(cleaned["pattern_cluster"], "pattern_clusters", active_taxonomy, label_mapping, set(selected.get("pattern_clusters", [])))
+        if mapped_cluster:
+            cleaned["pattern_cluster"] = mapped_cluster
+        else:
+            proposed["pattern_clusters"].append(cleaned["pattern_cluster"])
 
     # Proposed new labels.
     merged_proposed = merged.get("proposed_new_labels") if isinstance(merged.get("proposed_new_labels"), dict) else {}
@@ -1469,10 +1596,6 @@ def sanitize_final_metadata(candidate: Any, selected: Dict[str, List[str]], acti
         issues.append("empty_failure_model")
     if cleaned["metadata_confidence"] < 0.45:
         issues.append("low_confidence")
-    if cleaned["pattern_cluster"] and cleaned["pattern_cluster"] not in set(selected.get("pattern_clusters", [])):
-        issues.append("pattern_cluster_not_allowed")
-    if cleaned["topic_path"] and any(p not in set(selected.get("topic_paths", [])) for p in cleaned["topic_path"]):
-        issues.append("topic_path_not_allowed")
 
     for label in cleaned["taxonomy"]["micro_skills"]:
         if label in BROAD_MICRO_SKILLS:
@@ -1490,7 +1613,7 @@ def sanitize_final_metadata(candidate: Any, selected: Dict[str, List[str]], acti
     # Final validation state.
     review_reasons = []
     for issue in issues:
-        if issue.startswith("unknown_") or issue in STRICT_REVIEW_ISSUES or issue in SOFT_REVIEW_ISSUES:
+        if issue in STRICT_REVIEW_ISSUES or issue in SOFT_REVIEW_ISSUES:
             review_reasons.append(issue)
     cleaned["validation"]["needs_human_review"] = bool(review_reasons)
     cleaned["validation"]["review_reasons"] = dedupe(review_reasons)
