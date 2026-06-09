@@ -611,6 +611,15 @@
       "parent": null
     },
     {
+      "label": "rejection_sampling",
+      "description": "Map one uniform source into another by accepting only valid samples.",
+      "aliases": [
+        "accept_reject_sampling",
+        "accept_reject"
+      ],
+      "parent": null
+    },
+    {
       "label": "meet_in_the_middle",
       "description": "Split the search space into two halves and combine partial results.",
       "aliases": [
@@ -861,6 +870,15 @@
         "zero_one_bfs_shortest_path"
       ],
       "parent": null
+    },
+    {
+      "label": "recursive_solution",
+      "description": "Use recursion as the primary solving strategy.",
+      "aliases": [
+        "recursive_approach",
+        "recursion_based_solution"
+      ],
+      "parent": null
     }
   ],
   "patterns": [
@@ -923,7 +941,7 @@
       ],
       "common_micro_skills": [
         "pointer_update",
-        "linked_list_pointer_update",
+        "cycle_entry_detection",
         "state_tracking"
       ]
     },
@@ -1276,6 +1294,23 @@
       ]
     },
     {
+      "label": "isomorphism",
+      "description": "Establish a consistent one-to-one mapping between two sequences or structures.",
+      "aliases": [
+        "isomorphic_strings",
+        "one_to_one_mapping"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "hash_map_lookup"
+      ],
+      "common_micro_skills": [
+        "character_mapping",
+        "state_tracking",
+        "hash_map_usage"
+      ]
+    },
+    {
       "label": "matrix_spiral_traversal",
       "description": "Traverse a grid in layered spiral order.",
       "aliases": [],
@@ -1609,6 +1644,32 @@
         "probabilistic_reasoning",
         "state_tracking"
       ]
+    },
+    {
+      "label": "randomized_data_structure",
+      "description": "Maintain a data structure that supports updates plus random access or random selection.",
+      "aliases": [
+        "randomized_set_design",
+        "randomized_collection_design"
+      ],
+      "parent": null
+    },
+    {
+      "label": "weighted_random_selection",
+      "description": "Select elements proportionally to weights using cumulative state or equivalent sampling.",
+      "aliases": [
+        "weight_based_random_selection",
+        "random_pick_with_weight"
+      ],
+      "parent": null
+    },
+    {
+      "label": "randomized_matrix_selection",
+      "description": "Randomly select matrix cells or grid positions while preserving flip/reset state.",
+      "aliases": [
+        "random_flip_matrix"
+      ],
+      "parent": null
     },
     {
       "label": "meet_in_the_middle",
@@ -1993,6 +2054,249 @@
         "bitmask_operations",
         "state_encoding"
       ]
+    },
+    {
+      "label": "linked_list_cycle",
+      "description": "Detect whether a linked list contains a cycle and, when needed, locate the entry node.",
+      "aliases": [
+        "linked_list_cycle_detection",
+        "cycle_detection_in_linked_list"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "two_pointers",
+        "linked_list_manipulation",
+        "hash_map_lookup"
+      ],
+      "common_micro_skills": [
+        "cycle_entry_detection",
+        "linked_list_pointer_update",
+        "pointer_update",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "k_sum",
+      "description": "Solve k-element sum problems by sorting, duplicate skipping, and recursive reduction to smaller sum families.",
+      "aliases": [
+        "k_sum_problem",
+        "k_sum_family"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "sorting",
+        "two_pointers",
+        "hash_map_lookup"
+      ],
+      "common_micro_skills": [
+        "sorting_preprocessing",
+        "duplicate_handling",
+        "index_management",
+        "two_pointer_coordination"
+      ]
+    },
+    {
+      "label": "expression_evaluation",
+      "description": "Evaluate arithmetic or symbolic expressions with operator precedence and nested scopes.",
+      "aliases": [
+        "calculator_expression_evaluation",
+        "expression_parser"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "stack_queue",
+        "simulation",
+        "recursive_solution"
+      ],
+      "common_micro_skills": [
+        "stack_usage",
+        "operator_precedence_handling",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "binary_operation",
+      "description": "Perform digit-by-digit or symbol-by-symbol arithmetic with carry, overflow, or concatenation handling.",
+      "aliases": [
+        "digit_arithmetic",
+        "carry_based_arithmetic"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "simulation",
+        "two_pointers",
+        "recursive_solution"
+      ],
+      "common_micro_skills": [
+        "carry_propagation",
+        "array_indexing",
+        "string_indexing"
+      ]
+    },
+    {
+      "label": "roman_numeral_conversion",
+      "description": "Convert between Roman numerals and integers, including subtractive notation.",
+      "aliases": [
+        "roman_conversion",
+        "roman_numeral_parsing"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "greedy_choice",
+        "hash_map_lookup",
+        "simulation"
+      ],
+      "common_micro_skills": [
+        "symbol_value_lookup",
+        "state_tracking",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "number_to_words",
+      "description": "Convert numeric values into English words by chunking into scale groups.",
+      "aliases": [
+        "integer_to_words",
+        "english_words_conversion"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "divide_and_conquer",
+        "recursive_solution",
+        "simulation"
+      ],
+      "common_micro_skills": [
+        "digit_chunking",
+        "state_tracking",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "in_place_reversal",
+      "description": "Reverse a sequence or segment in place using swaps, segment flips, or pointer rewiring.",
+      "aliases": [
+        "sequence_reversal",
+        "segment_reversal"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "two_pointers",
+        "simulation"
+      ],
+      "common_micro_skills": [
+        "array_indexing",
+        "string_indexing",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "stack_based_reverse_traversal",
+      "description": "Use a stack or recursive unwind to emit elements in reverse order.",
+      "aliases": [
+        "reverse_traversal_stack"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "stack_queue",
+        "recursive_solution"
+      ],
+      "common_micro_skills": [
+        "stack_usage",
+        "state_tracking",
+        "boundary_handling"
+      ]
+    },
+    {
+      "label": "tree_rewiring",
+      "description": "Rewire tree pointers to transform the structure into a different tree or linear form.",
+      "aliases": [
+        "tree_flattening",
+        "tree_to_list"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "depth_first_search",
+        "simulation",
+        "recursive_solution"
+      ],
+      "common_micro_skills": [
+        "tree_node_access",
+        "pointer_update",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "linked_list_flattening",
+      "description": "Flatten a multilevel linked structure by splicing child chains into the main chain.",
+      "aliases": [
+        "multilevel_list_flattening",
+        "linked_list_splicing"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "linked_list_manipulation",
+        "depth_first_search",
+        "simulation"
+      ],
+      "common_micro_skills": [
+        "linked_list_pointer_update",
+        "pointer_update",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "forward_order_addition",
+      "description": "Add numbers stored most-significant-digit first, usually via stacks or reversed traversal.",
+      "aliases": [
+        "stack_based_addition",
+        "forward_digit_addition"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "stack_queue",
+        "linked_list_manipulation",
+        "recursive_solution"
+      ],
+      "common_micro_skills": [
+        "stack_usage",
+        "carry_propagation",
+        "linked_list_pointer_update"
+      ]
+    },
+    {
+      "label": "array_rearrangement",
+      "description": "Reorder, rotate, or place array elements into a new arrangement in place.",
+      "aliases": [
+        "in_place_array_reordering",
+        "sequence_rearrangement"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "two_pointers",
+        "simulation",
+        "cyclic_sort"
+      ],
+      "common_micro_skills": [
+        "array_indexing",
+        "boundary_handling",
+        "state_tracking"
+      ]
+    },
+    {
+      "label": "binary_search_on_answer",
+      "description": "Binary search over a monotone answer space to find the optimal feasible value.",
+      "aliases": [
+        "parametric_search",
+        "binary_search_on_answers"
+      ],
+      "parent": null,
+      "related_algorithms": [
+        "binary_search_on_answer"
+      ],
+      "common_micro_skills": [
+        "boundary_handling",
+        "state_tracking"
+      ]
     }
   ],
   "micro_skills": [
@@ -2249,6 +2553,18 @@
         "longest_substring_without_repeating",
         "minimum_window_substring",
         "string_matching"
+      ]
+    },
+    {
+      "label": "character_mapping",
+      "description": "Map symbols or values consistently across two structures.",
+      "aliases": [
+        "mapping"
+      ],
+      "parent": null,
+      "related_patterns": [
+        "isomorphism",
+        "word_pattern"
       ]
     },
     {
@@ -2881,6 +3197,117 @@
       "related_patterns": [
         "tree_dfs",
         "linked_list_reversal"
+      ]
+    },
+    {
+      "label": "carry_propagation",
+      "description": "Track and propagate carry or borrow correctly across digit-wise arithmetic.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "binary_operation",
+        "forward_order_addition"
+      ]
+    },
+    {
+      "label": "symbol_value_lookup",
+      "description": "Map symbols to numeric values and apply local conversion rules safely.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "roman_numeral_conversion"
+      ]
+    },
+    {
+      "label": "digit_chunking",
+      "description": "Split a number into thousand-scale or digit groups for staged processing.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "number_to_words"
+      ]
+    },
+    {
+      "label": "operator_precedence_handling",
+      "description": "Apply parentheses and operator precedence correctly while evaluating expressions.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "expression_evaluation"
+      ]
+    },
+    {
+      "label": "recursion_unwinding",
+      "description": "Track the return path and accumulated result correctly while unwinding recursion.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "recursive_solution"
+      ]
+    },
+    {
+      "label": "interval_comparison",
+      "description": "Compare interval endpoints, overlaps, and ordering constraints carefully.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "merge_intervals"
+      ]
+    },
+    {
+      "label": "sorting_preprocessing",
+      "description": "Sort or preprocess the input before applying the main reasoning step.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "two_sum",
+        "three_sum",
+        "k_sum"
+      ]
+    },
+    {
+      "label": "state_reset",
+      "description": "Reset state cleanly between branches, iterations, or groups.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "backtracking_combinations"
+      ]
+    },
+    {
+      "label": "topological_indegree_tracking",
+      "description": "Maintain indegree counts and dependency queues correctly.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "topological_ordering"
+      ]
+    },
+    {
+      "label": "rolling_accumulator",
+      "description": "Maintain a rolling aggregate or balance as the scan progresses.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "buy_and_sell_stock"
+      ]
+    },
+    {
+      "label": "sql_window_reasoning",
+      "description": "Use partitions, ordering, and window frames correctly in SQL.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "sql_window_function"
+      ]
+    },
+    {
+      "label": "direction_iteration",
+      "description": "Advance in the correct directional order when traversing a grid or spiral.",
+      "aliases": [],
+      "parent": null,
+      "related_patterns": [
+        "matrix_spiral_traversal"
       ]
     }
   ],
@@ -3693,6 +4120,38 @@
         "string_matching",
         "cache_design"
       ]
+    },
+    {
+      "label": "cycle_detection_miss",
+      "description": "Fail to recognize or correctly handle a repeated state, loop, or cycle in an iterative process.",
+      "aliases": [
+        "missed_cycle_detection",
+        "cycle_miss"
+      ],
+      "affected_skills": [
+        "cycle_entry_detection",
+        "pointer_update",
+        "state_tracking"
+      ],
+      "affected_patterns": [
+        "fast_slow_pointer",
+        "linked_list_cycle"
+      ]
+    },
+    {
+      "label": "mapping_conflict",
+      "description": "Build an inconsistent or non-bijective mapping between paired symbols or values.",
+      "aliases": [
+        "inconsistent_mapping",
+        "character_map_conflict"
+      ],
+      "affected_skills": [
+        "character_mapping",
+        "hash_map_usage"
+      ],
+      "affected_patterns": [
+        "isomorphism"
+      ]
     }
   ],
   "pattern_clusters": [
@@ -3720,20 +4179,26 @@
       "label": "linked_list_pointer_work",
       "description": "Pointer-heavy linked-list manipulation and cycle logic.",
       "patterns": [
-        "linked_list_reversal",
+        "fast_slow_pointer",
+        "forward_order_addition",
         "linked_list_cycle",
-        "fast_slow_pointer"
+        "linked_list_flattening",
+        "linked_list_reversal"
       ]
     },
     {
       "label": "tree_traversal_and_construction",
       "description": "Tree traversal, reconstruction, and ancestor reasoning.",
       "patterns": [
-        "tree_level_order",
-        "tree_dfs",
         "bst_validation",
         "lowest_common_ancestor",
-        "tree_construction"
+        "tree_construction",
+        "tree_dfs",
+        "tree_level_order",
+        "tree_rewiring"
+      ],
+      "aliases": [
+        "level_order_traversal"
       ]
     },
     {
@@ -3744,6 +4209,11 @@
         "shortest_path",
         "topological_ordering",
         "graph_union_find_components"
+      ],
+      "aliases": [
+        "dependency_resolution",
+        "grid_based_problem",
+        "pathfinding"
       ]
     },
     {
@@ -3761,6 +4231,10 @@
         "dp_linear_sequence",
         "dp_grid",
         "dp_interval"
+      ],
+      "aliases": [
+        "sequence_analysis",
+        "string_segmentation"
       ]
     },
     {
@@ -3772,38 +4246,57 @@
         "combination_sum",
         "n_queen",
         "sudoku_validation"
+      ],
+      "aliases": [
+        "digit_combination",
+        "sequence_generation",
+        "subsequence_problem"
       ]
     },
     {
       "label": "string_and_stack_patterns",
       "description": "Delimiter matching, palindrome, and string searching patterns.",
       "patterns": [
+        "in_place_reversal",
+        "monotonic_stack",
         "palindrome_check",
-        "valid_parentheses",
+        "stack_based_reverse_traversal",
         "string_matching",
-        "monotonic_stack"
+        "valid_parentheses"
       ]
     },
     {
       "label": "design_and_state",
       "description": "Problems where state structure and invariants dominate the solution.",
       "patterns": [
+        "buy_and_sell_stock",
         "design_lru_cache",
         "design_median_finder",
-        "buy_and_sell_stock",
+        "expression_evaluation",
         "jump_game"
+      ],
+      "aliases": [
+        "expression_evaluation",
+        "iterator_pattern",
+        "queue_based"
       ]
     },
     {
       "label": "array_rearrangement",
       "description": "Array reshaping, ordering, and placement-style patterns.",
       "patterns": [
+        "array_rearrangement",
         "cyclic_sort",
-        "matrix_spiral_traversal",
-        "matrix_rotation",
         "heap_top_k",
-        "trapping_rain_water",
-        "longest_consecutive_sequence"
+        "in_place_reversal",
+        "longest_consecutive_sequence",
+        "matrix_rotation",
+        "matrix_spiral_traversal",
+        "trapping_rain_water"
+      ],
+      "aliases": [
+        "partitioning",
+        "in_place_modification"
       ]
     },
     {
@@ -3814,6 +4307,12 @@
         "palindrome_manacher",
         "rolling_hash_search",
         "suffix_structure_processing"
+      ],
+      "aliases": [
+        "string_manipulation",
+        "substring_search",
+        "palindrome_recognition",
+        "palindrome_check"
       ]
     },
     {
@@ -3830,10 +4329,17 @@
       "label": "advanced_number_theory_and_math",
       "description": "Prime, modular, recurrence, and geometry-adjacent math routines.",
       "patterns": [
-        "prime_sieve_factorization",
-        "matrix_exponentiation_dp",
         "advanced_bit_tricks",
-        "convex_hull_geometry"
+        "binary_operation",
+        "convex_hull_geometry",
+        "matrix_exponentiation_dp",
+        "number_to_words",
+        "prime_sieve_factorization",
+        "roman_numeral_conversion"
+      ],
+      "aliases": [
+        "binary_operation",
+        "base_conversion"
       ]
     },
     {
@@ -3852,6 +4358,10 @@
       "patterns": [
         "sorting_and_order_statistics",
         "kadane_max_subarray"
+      ],
+      "aliases": [
+        "majority_element",
+        "inversion_count"
       ]
     },
     {
@@ -3868,6 +4378,14 @@
       "patterns": [
         "prefix_suffix_combination",
         "kadane_max_subarray"
+      ],
+      "aliases": [
+        "subarray_problem",
+        "consecutive_element",
+        "frequency_count",
+        "frequency_counting",
+        "intersection",
+        "missing_element"
       ]
     },
     {
@@ -3878,6 +4396,52 @@
         "monotonic_queue_window",
         "data_stream_median",
         "cache_design"
+      ],
+      "aliases": [
+        "weighted_random_selection"
+      ]
+    },
+    {
+      "label": "sql_patterns",
+      "description": "SQL grouping, joins, filtering, and window-function query families.",
+      "aliases": [
+        "sql_query_pattern",
+        "query_optimization",
+        "data_querying",
+        "grouping_and_aggregation",
+        "data_grouping_and_aggregation",
+        "report_generation"
+      ],
+      "parent": null,
+      "patterns": [
+        "sql_group_by",
+        "sql_window_function"
+      ]
+    },
+    {
+      "label": "range_query",
+      "description": "Families that answer mutable or immutable range queries over arrays, trees, and bitwise accumulations.",
+      "aliases": [
+        "range_query"
+      ],
+      "parent": null,
+      "patterns": [
+        "segment_tree_range_query",
+        "fenwick_prefix_query"
+      ]
+    },
+    {
+      "label": "numeric_arithmetic_and_conversions",
+      "description": "Digit-wise arithmetic, numeral conversion, and number-format translation families.",
+      "patterns": [
+        "binary_operation",
+        "roman_numeral_conversion",
+        "number_to_words",
+        "forward_order_addition"
+      ],
+      "aliases": [
+        "numeric_conversion",
+        "number_formatting"
       ]
     }
   ],
@@ -4279,6 +4843,7 @@
         "ordered_map",
         "sieve_of_eratosthenes",
         "prime_factorization",
+        "rejection_sampling",
         "convex_hull",
         "median_of_data_stream",
         "lru_cache",
@@ -4294,7 +4859,10 @@
         "prime_sieve_factorization",
         "convex_hull_geometry",
         "cache_design",
-        "data_stream_median"
+        "data_stream_median",
+        "randomized_data_structure",
+        "weighted_random_selection",
+        "randomized_matrix_selection"
       ],
       "contains_micro_skills": [
         "bitmask_operations",
@@ -4303,6 +4871,7 @@
         "null_handling",
         "sieve_marking",
         "prime_factor_extraction",
+        "probabilistic_reasoning",
         "cross_product_orientation",
         "cache_eviction_policy"
       ]
@@ -4321,8 +4890,10 @@
         "hash_map_lookup"
       ],
       "contains_patterns": [
-        "two_sum",
-        "subarray_sum"
+        "binary_operation",
+        "k_sum",
+        "subarray_sum",
+        "two_sum"
       ],
       "contains_micro_skills": [
         "index_management",
@@ -4367,9 +4938,10 @@
         "rolling_hash_string_matching"
       ],
       "contains_patterns": [
-        "string_matching",
         "palindrome_manacher",
-        "rolling_hash_search"
+        "rolling_hash_search",
+        "stack_based_reverse_traversal",
+        "string_matching"
       ],
       "contains_micro_skills": [
         "failure_function_construction",
@@ -4614,8 +5186,11 @@
         "matrix_exponentiation"
       ],
       "contains_patterns": [
+        "binary_operation",
+        "matrix_exponentiation_dp",
+        "number_to_words",
         "prime_sieve_factorization",
-        "matrix_exponentiation_dp"
+        "roman_numeral_conversion"
       ],
       "contains_micro_skills": [
         "sieve_marking",
@@ -4794,6 +5369,18 @@
       "target_label": "prime_sieve_factorization"
     },
     {
+      "label": "practice_probabilistic_reasoning",
+      "description": "Practice uniform sampling, expected value, and probability reasoning.",
+      "target_type": "micro_skill",
+      "target_label": "probabilistic_reasoning"
+    },
+    {
+      "label": "practice_rejection_sampling",
+      "description": "Practice accept-reject sampling and uniform random mapping.",
+      "target_type": "algorithm",
+      "target_label": "rejection_sampling"
+    },
+    {
       "label": "practice_cache_design",
       "description": "Reinforce cache state, eviction, and update logic.",
       "target_type": "pattern",
@@ -4858,6 +5445,84 @@
       "description": "General practice or reinforcement for a known technique.",
       "target_type": "problem_role",
       "target_label": "reinforcement"
+    },
+    {
+      "label": "learn_hash_map_lookup",
+      "description": "Use hash-based lookup for membership, pairing, counting, and one-pass scanning.",
+      "target_type": "algorithm",
+      "target_label": "hash_map_lookup"
+    },
+    {
+      "label": "practice_pair_and_sum",
+      "description": "Practice complement-based pairing and duplicate-aware sum reasoning.",
+      "target_type": "pattern",
+      "target_label": "two_sum"
+    },
+    {
+      "label": "practice_fast_slow_pointer",
+      "description": "Practice two-speed state advancement to detect cycles and repeated states.",
+      "target_type": "pattern",
+      "target_label": "fast_slow_pointer"
+    },
+    {
+      "label": "practice_isomorphism",
+      "description": "Practice one-to-one mapping and consistent remapping between two sequences.",
+      "target_type": "pattern",
+      "target_label": "isomorphism"
+    },
+    {
+      "label": "practice_linked_list_cycle",
+      "description": "Practice detecting and locating cycles in linked lists.",
+      "target_type": "pattern",
+      "target_label": "linked_list_cycle"
+    },
+    {
+      "label": "practice_k_sum",
+      "description": "Practice k-sum reduction, duplicate skipping, and multi-pointer expansion.",
+      "target_type": "pattern",
+      "target_label": "k_sum"
+    },
+    {
+      "label": "practice_expression_evaluation",
+      "description": "Practice parsing and evaluating expressions with nested precedence.",
+      "target_type": "pattern",
+      "target_label": "expression_evaluation"
+    },
+    {
+      "label": "practice_numeric_arithmetic",
+      "description": "Practice digit-wise arithmetic and carry propagation.",
+      "target_type": "pattern",
+      "target_label": "binary_operation"
+    },
+    {
+      "label": "practice_number_conversions",
+      "description": "Practice Roman numerals and number-format conversions.",
+      "target_type": "pattern",
+      "target_label": "roman_numeral_conversion"
+    },
+    {
+      "label": "practice_in_place_reversal",
+      "description": "Practice in-place reversal over arrays, strings, or segments.",
+      "target_type": "pattern",
+      "target_label": "in_place_reversal"
+    },
+    {
+      "label": "practice_tree_rewiring",
+      "description": "Practice restructuring trees into other forms without losing connections.",
+      "target_type": "pattern",
+      "target_label": "tree_rewiring"
+    },
+    {
+      "label": "practice_linked_list_flattening",
+      "description": "Practice flattening multi-level linked structures by splicing chains.",
+      "target_type": "pattern",
+      "target_label": "linked_list_flattening"
+    },
+    {
+      "label": "practice_forward_order_addition",
+      "description": "Practice adding numbers stored in forward order.",
+      "target_type": "pattern",
+      "target_label": "forward_order_addition"
     }
   ],
   "problem_roles": [

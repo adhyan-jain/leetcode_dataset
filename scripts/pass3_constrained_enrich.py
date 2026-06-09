@@ -848,9 +848,16 @@ def canonicalize_topic_path(value: Any, allowed_paths: Iterable[str]) -> str:
     allowed_list = [normalize_whitespace(str(path)) for path in allowed_paths if normalize_whitespace(str(path))]
     if text in allowed_list:
         return text
-    collapsed = normalize_taxonomy_label(text)
+
+    def collapse_path_key(path: str) -> str:
+        normalized = normalize_taxonomy_label(path)
+        return normalized.replace("_", "")
+
+    text_key = collapse_path_key(text)
+    if not text_key:
+        return ""
     for path in allowed_list:
-        if normalize_taxonomy_label(path) == collapsed:
+        if collapse_path_key(path) == text_key:
             return path
     return ""
 

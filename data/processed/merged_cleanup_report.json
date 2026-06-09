@@ -1,0 +1,24 @@
+{
+  "row_count": 1619,
+  "validation_pass": true,
+  "unknown_label_counts": {
+    "count": 0
+  },
+  "manual_review_needed": [],
+  "summary": {
+    "rows": 1619,
+    "empty_skill_requires": 0,
+    "empty_skill_trains": 0,
+    "empty_skill_tests": 0,
+    "empty_failure_model": 0,
+    "empty_topic_path": 0,
+    "empty_summary": 0,
+    "unknown_labels": 0,
+    "topics_filled": 0
+  },
+  "notes": [
+    "merged.json and merged_cleaned.json were synchronized",
+    "skill_model trains/tests and failure_model were populated from taxonomy and solution evidence",
+    "numeric fields were recalibrated from LeetCode difficulty, acceptance rate, frequency, and source evidence"
+  ]
+}
